@@ -18,11 +18,21 @@ class App extends Component {
 }
 
   render() {
-    console.log(this.state.nasaData)
+    if(this.state.nasaData != ""){
+        console.log(this.state.nasaData.items[39].data[0])
+    }
     return (
       <div className="App">
       {(this.state.nasaData != "")
-      ?<img src = {this.state.nasaData.items[42].links[0].href}/>:
+      ?<header> {this.state.nasaData.items[39].data[0].title} </header>:
+      <div> </div>
+      }
+      {(this.state.nasaData != "")
+      ?<img src = {this.state.nasaData.items[39].links[0].href}/>:
+      <div> </div>
+      }
+      {(this.state.nasaData != "")
+      ?<p> {this.state.nasaData.items[39].data[0].description} </p>:
       <div> </div>
       }
       </div>

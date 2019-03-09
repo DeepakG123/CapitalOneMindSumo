@@ -1,15 +1,21 @@
 import React, { Component } from 'react';
 import './App.css';
+import PhotoDisplay from './PhotoDisplay.js';
 import axios from 'axios';
 import ls from 'local-storage'
+import { Input, Button } from 'antd';
+import 'antd/dist/antd.css';
+const InputGroup = Input.Group;
+const Search = Input.Search;
 
 
 const api_key = process.env.REACT_APP_API_KEY
 
+
 class App extends Component {
   state = {
       nasaData: "",
-      search: "Neptune"
+      search: ""
   }
 
   handleUserInput = e => {
@@ -36,30 +42,30 @@ class App extends Component {
     if(this.state.nasaData != ""){
         console.log(this.state)
     }
-    console.log(ls.get("search"))
+    console.log(ls.get("search") != null)
     return (
       <div className="App">
       <div className= "SearchForm">
-      <form>
-        <label>
-          Search for an Image:
-          <input  id = "search" type="text" name="name" onChange={e => this.handleUserInput(e)} />
-        </label>
-        <button onClick = {e => this.search(e)}> Submit </button>
-      </form>
+      <InputGroup>
+      <Search style={{ width: 200, textAlign: 'center' }} placeholder="Search" id = "search" onChange={e => this.handleUserInput(e)}  enterButton/>
+      <Search style={{ width: 200, textAlign: 'center' }} placeholder="Location" enterButton/>
+      </InputGroup>
+      <br/>
+      <Button onClick = {e => this.search(e)}> Submit </Button>
       </div>
       {(this.state.nasaData != "")
-      ?<header> {this.state.nasaData.items[20].data[0].title} </header>:
+      ?<header> {this.state.nasaData.items[2].data[0].title} </header>:
       <div> </div>
       }
       {(this.state.nasaData != "")
-      ?<img src = {this.state.nasaData.items[20].links[0].href}/>:
+      ?<img  style = {{width: 400, height: 400}} src = {this.state.nasaData.items[2].links[0].href}/>:
       <div> </div>
       }
       {(this.state.nasaData != "")
-      ?<p> {this.state.nasaData.items[20].data[0].description} </p>:
+      ?<p> {this.state.nasaData.items[2].data[0].description} </p>:
       <div> </div>
       }
+      <PhotoDisplay/>
       </div>
     );
   }

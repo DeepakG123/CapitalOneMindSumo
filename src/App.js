@@ -20,11 +20,14 @@ class App extends Component {
       search: "",
       test: "hello",
       visible: false,
+      currentItem: 0
   }
 
-  showModal = () => {
+  showModal = (index) => {
+  console.log("index: " + index)
   this.setState({
     visible: true,
+    currentItem: index
   });
 }
 
@@ -83,7 +86,7 @@ handleOk = (e) => {
     var photos = this.state.nasaData.items.slice(0, 25).map((item,index) => {
           return(
         <Col span={6}  style={{paddingTop: 15, paddingRight: 20, paddingLeft: 20}}>
-        <Card hoverable cover={<img src= {item.links[0].href} onClick= {this.showModal} height="200" width="200"/>}
+        <Card value = {index} hoverable cover={<img src= {item.links[0].href} onClick= {() => this.showModal(index)} height="200" width="200"/>}
         >
         <Meta
           title={item.data[0].title}
@@ -109,12 +112,19 @@ handleOk = (e) => {
       <Button onClick = {e => this.search(e)}> Submit </Button>
       </div>
       {photos}
-      <Modal
+      {(this.state.nasaData != "")
+      ?<Modal
         title="Basic Modal"
         visible={this.state.visible}
         onOk={this.handleOk}
         onCancel={this.handleCancel}
-      />
+        title = {this.state.nasaData.items[this.state.currentItem].data[0].title}>
+        <p> Center: {this.state.nasaData.items[this.state.currentItem].data[0].center} </p>
+        <p> Date Created: {this.state.nasaData.items[this.state.currentItem].data[0].date_created} </p>
+        <p> Description: {this.state.nasaData.items[this.state.currentItem].data[0].description_508} </p>
+      </Modal>:
+      <div/>
+      }
       </div>
     );
   }

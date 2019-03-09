@@ -3,7 +3,7 @@ import './App.css';
 import PhotoDisplay from './PhotoDisplay.js';
 import axios from 'axios';
 import ls from 'local-storage'
-import { Input, Button } from 'antd';
+import { Input, Button, Col, Card} from 'antd';
 import 'antd/dist/antd.css';
 const InputGroup = Input.Group;
 const Search = Input.Search;
@@ -15,7 +15,8 @@ const api_key = process.env.REACT_APP_API_KEY
 class App extends Component {
   state = {
       nasaData: "",
-      search: ""
+      search: "",
+      test: "hello"
   }
 
   handleUserInput = e => {
@@ -42,6 +43,21 @@ class App extends Component {
     if(this.state.nasaData != ""){
         console.log(this.state)
     }
+    if(this.state.nasaData != ""){
+    var photos = this.state.nasaData.items.slice(0, 25).map((item,index) => {
+          return(
+        <Col span={6} style={{}}>
+        <Card hoverable style={{ width: 240}} cover={<img src= {item.links[0].href}  height="200" width="200"/>}
+          title={item.data[0].title}
+        >
+        </Card>
+        </Col>
+      )})
+    }
+    else{
+      var photos = null
+    }
+
     console.log(ls.get("search") != null)
     return (
       <div className="App">
@@ -53,19 +69,7 @@ class App extends Component {
       <br/>
       <Button onClick = {e => this.search(e)}> Submit </Button>
       </div>
-      {(this.state.nasaData != "")
-      ?<header> {this.state.nasaData.items[2].data[0].title} </header>:
-      <div> </div>
-      }
-      {(this.state.nasaData != "")
-      ?<img  style = {{width: 400, height: 400}} src = {this.state.nasaData.items[2].links[0].href}/>:
-      <div> </div>
-      }
-      {(this.state.nasaData != "")
-      ?<p> {this.state.nasaData.items[2].data[0].description} </p>:
-      <div> </div>
-      }
-      <PhotoDisplay/>
+      {photos}
       </div>
     );
   }

@@ -38,16 +38,24 @@ class App extends Component {
       location: "",
       visible: false,
       currentItem: 0,
+      currentFav: 0,
       checkedCenters: [],
   }
 
 //Function for opening Modal to show image metadata
 showModal = (index) => {
-  console.log("index: " + index)
+  if(this.state.current == "favorite"){
+    this.setState({
+      visible: true,
+      currentFav: index
+    });
+  }
+  else{
   this.setState({
     visible: true,
     currentItem: index
   });
+}
 }
 
 //Modal Button Function
@@ -84,6 +92,14 @@ handleOk = (e) => {
   onClick = item => {
     ls.set("search", item)
     this.search()
+  }
+
+  //Menu selector, changes page
+  handleClick = (e) => {
+    console.log('click ', e);
+    this.setState({
+      current: e.key,
+    });
   }
 
   //Which NASA center to search for
@@ -192,12 +208,72 @@ handleOk = (e) => {
     else{
       var photos = null
     }
+    if(this.state.nasaData != ""){
+    var favPhotos = JSON.parse(ls.get("favorites")).map((item,index) => {
+      return(
+        <Col span={6}  style={{paddingTop: 15, paddingRight: 20, paddingLeft: 20}}>
+        <Card  hoverable cover={<img src= {item.links[0].href} onClick= {() => this.showModal(index)} height="200" width="200"/>}
+        >
+        <Meta
+          title={item.data[0].title}
+          onClick= {this.showModal}
+        />
+        </Card>
+        </Col>
+      )
+    })
+  }
 
     var centers = options.map(option => {
       return(
         <Option value={option.value} onClick= {() => this.setCenter(option.value)} >{option.label}</Option>
       )}
     )
+    console.log("current: " + this.state.current)
+    if(this.state.current == "favorite"){
+      return (
+        <div>
+        <Header>
+          <Content style = {{color: "white", textAlign: 'center',  fontSize: "large"}}>
+          Nasa Image Library Search
+          </Content>
+        </Header>
+        <div style = {{textAlign: 'center'}}>
+        <Menu
+        onClick={this.handleClick}
+        selectedKeys={[this.state.current]}
+        mode="horizontal"
+        >
+        <Menu.Item key="home page">
+          <Icon type="home" />Home Page
+        </Menu.Item>
+        <Menu.Item key="app">
+          <Icon type="camera" />Image Search
+        </Menu.Item>
+        <Menu.Item key="favorite">
+          <Icon type="star" />Favorite Images
+        </Menu.Item>
+        </Menu>
+        </div>
+        {favPhotos}
+        {(this.state.nasaData != "")
+        ?<Modal
+          title="Basic Modal"
+          visible={this.state.visible}
+          onOk={this.handleOk}
+          onCancel={this.handleCancel}
+          title = {JSON.parse(ls.get("favorites"))[this.state.currentFav].data[0].title}>
+          <p> Center: {JSON.parse(ls.get("favorites"))[this.state.currentFav].data[0].center} </p>
+          <p> Date Created: {JSON.parse(ls.get("favorites"))[this.state.currentFav].data[0].date_created}</p>
+          <p> Description: {JSON.parse(ls.get("favorites"))[this.state.currentFav].data[0].description_508}</p>
+          <div style= {{textAlign: "center"}}>
+          </div>
+        </Modal>:
+        <div/>
+        }
+        </div>
+      )
+    }
 
     return (
       <div className="App">

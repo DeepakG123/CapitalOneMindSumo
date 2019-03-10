@@ -3,12 +3,13 @@ import './App.css';
 import PhotoDisplay from './PhotoDisplay.js';
 import axios from 'axios';
 import ls from 'local-storage'
-import { Input, Button, Col, Card, Modal} from 'antd';
+import { Input, Button, Col, Card, Modal, Layout, Collapse, DatePicker, Row} from 'antd';
 import 'antd/dist/antd.css';
+const { Header, Content} = Layout;
 const { Meta } = Card;
 const InputGroup = Input.Group;
 const Search = Input.Search;
-
+const Panel = Collapse.Panel;
 
 const api_key = process.env.REACT_APP_API_KEY
 var searchHistory = [];
@@ -18,7 +19,7 @@ class App extends Component {
   state = {
       nasaData: "",
       search: "",
-      test: "hello",
+      location: "",
       visible: false,
       currentItem: 0
   }
@@ -70,6 +71,12 @@ handleOk = (e) => {
   }
 
   componentDidMount() {
+      if(!ls.get("search")){
+        ls.set("search", "")
+      }
+      if(!ls.get("location")){
+        ls.set("location", "")
+      }
       axios.get("https://images-api.nasa.gov/search?q=" + ls.get("search") + "&media_type=image")
       .then((res => {
       let data = res.data;
@@ -103,13 +110,26 @@ handleOk = (e) => {
     console.log(ls.get("search") != null)
     return (
       <div className="App">
+      <Header>
+        <Content style = {{color: "white", textAlign: 'center',  fontSize: "large"}}>
+        Nasa Image Library Search
+        </Content>
+      </Header>
       <div className= "SearchForm">
-      <InputGroup>
-      <Search style={{ width: 200, textAlign: 'center' }} placeholder="Search" id = "search" onChange={e => this.handleUserInput(e)}  enterButton/>
-      <Search style={{ width: 200, textAlign: 'center' }} placeholder="Location" enterButton/>
-      </InputGroup>
+      <Search style={{ width: 300, textAlign: 'center'}} placeholder="Search" id = "search" onChange={e => this.handleUserInput(e)} />
+      <div className= "MoreOptions" style = {{paddingLeft: "37.5%", paddingTop: "1%"}}>
+      <Collapse  defaultActiveKey={['0']} style={{ width: 350}}>
+        <Panel header="More Search Options" key="1">
+          <Col>
+          <Search style={{ width: 300}} placeholder="Location" id= "location" onChange={e => this.handleUserInput(e)}/>
+          <Search style={{ width: 300}} placeholder="Start Year" id= "startYear" onChange={e => this.handleUserInput(e)}/>
+          <Search style={{ width: 300}} placeholder="End Year" id= "endYear" onChange={e => this.handleUserInput(e)}/>
+          </Col>
+        </Panel>
+      </Collapse>
+      </div>
       <br/>
-      <Button onClick = {e => this.search(e)}> Submit </Button>
+      <Button  type="primary" htmlType="submit" onClick = {e => this.search(e)}> Submit </Button>
       </div>
       {photos}
       {(this.state.nasaData != "")

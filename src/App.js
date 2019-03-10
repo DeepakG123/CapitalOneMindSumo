@@ -3,7 +3,7 @@ import './App.css';
 import PhotoDisplay from './PhotoDisplay.js';
 import axios from 'axios';
 import ls from 'local-storage'
-import { Input, InputNumber,  Button, Col, Card, Modal, Layout, Collapse, DatePicker, Row, Checkbox, Menu, Icon, List} from 'antd';
+import { Input, InputNumber,  Button, Col, Card, Modal, Layout, Collapse, DatePicker, Row, Checkbox, Menu, Icon, List, Select} from 'antd';
 import 'antd/dist/antd.css';
 const { Header, Content} = Layout;
 const { Meta } = Card;
@@ -11,21 +11,23 @@ const InputGroup = Input.Group;
 const Search = Input.Search;
 const Panel = Collapse.Panel;
 const CheckboxGroup = Checkbox.Group;
+const Option = Select.Option;
 
-//API key hidden
+//API key hidden in .env file -> gitignore
 const api_key = process.env.REACT_APP_API_KEY
 
-//Tuple of all NASA centers
+//Tuple of all NASA centers, value is used for API request
 const options = [
-  { label: 'Jet Propulsion Laboratory (JPL)', value: 'Jet Propulsion Laboratory (JPL)' },
-  { label: 'Headquarters (HQ)', value: 'Headquarters (HQ)' },
-  { label: 'Kennedy Space Center (KSC)', value: 'Kennedy Space Center (KSC)' },
-  { label: 'Goddard Space Flight Center (GSFC)', value: 'Goddard Space Flight Center (GSFC)' },
-  { label: 'Langley Research Center (LARC)', value: 'Langley Research Center (LARC)' },
-  { label: 'Ames Research Center (ARC)', value: 'Ames Research Center (ARC)' },
-  { label: 'Marshall Space Flight Center (MSFC)', value: 'Marshall Space Flight Center (MSFC)' },
-  { label: 'John C. Stennis Space Center (SSC)', value: 'John C. Stennis Space Center (SSC)' },
-  { label: 'Armstrong Flight Research Center (ARFC)', value: 'Armstrong Flight Research Center (ARFC)' },
+  { label: 'All', value: '' },
+  { label: 'Jet Propulsion Laboratory (JPL)', value: 'JPL' },
+  { label: 'Headquarters (HQ)', value: 'HQ' },
+  { label: 'Kennedy Space Center (KSC)', value: 'KSC' },
+  { label: 'Goddard Space Flight Center (GSFC)', value: 'GSFC' },
+  { label: 'Langley Research Center (LARC)', value: 'LARC' },
+  { label: 'Ames Research Center (ARC)', value: 'ARC' },
+  { label: 'Marshall Space Flight Center (MSFC)', value: 'MSFC' },
+  { label: 'John C. Stennis Space Center (SSC)', value: 'SSC' },
+  { label: 'Armstrong Flight Research Center (ARFC)', value: 'ARFC' },
 ];
 
 
@@ -84,6 +86,11 @@ handleOk = (e) => {
     this.search()
   }
 
+  //Which NASA center to search for
+  setCenter = center => {
+    ls.set("center", center)
+  }
+
 
   //Search function, sends request to NASA's api
   //Adds search fields to search history array
@@ -92,7 +99,7 @@ handleOk = (e) => {
     console.log("End Year: " + ls.get("endYear"))
     var searchString = ""
     //API Request
-    searchString = "https://images-api.nasa.gov/search?q=" + ls.get("search") + "&media_type=image&year_start=" + ls.get("startYear") + "&year_end=" + ls.get("endYear")
+    searchString = "https://images-api.nasa.gov/search?q=" + ls.get("search") + "&media_type=image&year_start=" + ls.get("startYear") + "&year_end=" + ls.get("endYear") + "&center=" + ls.get("center")
     //Axios used for API request
     axios.get(searchString)
     .then((res => {
@@ -106,6 +113,7 @@ handleOk = (e) => {
     ls.set("searchHistory", JSON.stringify(searchHistory))
     ls.set("startYear", "1920")
     ls.set("endYear", "2019")
+    ls.set("center", "")
   }
 
   //Clears search history
@@ -124,6 +132,9 @@ handleOk = (e) => {
       }
       if(!ls.get("endYear")){
         ls.set("endYear", "2019")
+      }
+      if(ls.get("center") == "null" || !ls.get("center")){
+        ls.set("center", "")
       }
       if(ls.get("searchHistory") == "null"){
         ls.set("searchHistory", JSON.stringify(array))
@@ -166,7 +177,14 @@ handleOk = (e) => {
       var photos = null
     }
 
-    console.log((ls.get("endYear")))
+    var centers = options.map(option => {
+      return(
+        <Option value={option.value} onClick= {() => this.setCenter(option.value)} >{option.label}</Option>
+      )}
+    )
+
+    console.log((ls.get("center")))
+    console.log((ls.get("search")))
     return (
       <div className="App">
       <Header>
@@ -197,15 +215,17 @@ handleOk = (e) => {
           <Col>
           <div><strong>Search by Start Year and/or End Year</strong></div>
           <br/>
-          <Search style={{ width: 350}} placeholder="Start Year" id= "startYear" onChange={e => this.handleUserInput(e)}/>
-          <Search style={{ width: 350}} placeholder="End Year" id= "endYear" onChange={e => this.handleUserInput(e)}/>
+          <Search style={{ width: 350}} type="number"  placeholder="Start Year" id= "startYear" onChange={e => this.handleUserInput(e)}/>
+          <Search style={{ width: 350}} type="number" placeholder="End Year" id= "endYear" onChange={e => this.handleUserInput(e)}/>
           </Col>
         </Panel>
         <Panel header="NASA Centers" key="2">
           <Col>
           <div><strong>Search by NASA Centers</strong></div>
           <br/>
-          <CheckboxGroup options={options} onChange = {checkedValues => this.onChange(checkedValues)} />
+          <Select defaultValue="All" style={{ width: 300 }} options={options} id = "center">
+          {centers}
+          </Select>
           </Col>
         </Panel>
         <Panel header="Search History" key="3">

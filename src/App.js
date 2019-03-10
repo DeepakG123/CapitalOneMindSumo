@@ -66,6 +66,7 @@ handleOk = (e) => {
 
   //General function for storing user input from inout fields
   handleUserInput = e => {
+    //Add error checking for years here
     ls.set(e.target.id, e.target.value)
   };
 
@@ -87,8 +88,13 @@ handleOk = (e) => {
   //Search function, sends request to NASA's api
   //Adds search fields to search history array
   search = e => {
+    console.log("Start Year: " + ls.get("startYear"))
+    console.log("End Year: " + ls.get("endYear"))
+    var searchString = ""
+    //API Request
+    searchString = "https://images-api.nasa.gov/search?q=" + ls.get("search") + "&media_type=image&year_start=" + ls.get("startYear") + "&year_end=" + ls.get("endYear")
     //Axios used for API request
-    axios.get("https://images-api.nasa.gov/search?q=" + ls.get("search") + "&media_type=image")
+    axios.get(searchString)
     .then((res => {
     let data = res.data;
     this.setState({nasaData: data.collection})
@@ -98,6 +104,8 @@ handleOk = (e) => {
     searchHistory = JSON.parse(searchHistory)
     searchHistory.push(ls.get("search"))
     ls.set("searchHistory", JSON.stringify(searchHistory))
+    ls.set("startYear", "1920")
+    ls.set("endYear", "2019")
   }
 
   //Clears search history
@@ -111,7 +119,7 @@ handleOk = (e) => {
   componentDidMount() {
       var array = []
       //Setting up local storage on first use
-      if(!ls.get("startYear")){
+      if(!ls.get("endYear")){
         ls.set("startYear", "1920")
       }
       if(!ls.get("endYear")){
@@ -140,8 +148,8 @@ handleOk = (e) => {
   render() {
     if(this.state.nasaData != ""){
 
-    //Maps each photo to a display card, displayed in a grid 
-    var photos = this.state.nasaData.items.slice(0, 25).map((item,index) => {
+    //Maps each photo to a display card, displayed in a grid
+    var photos = this.state.nasaData.items.slice(0, 50).map((item,index) => {
           return(
         <Col span={6}  style={{paddingTop: 15, paddingRight: 20, paddingLeft: 20}}>
         <Card value = {index} hoverable cover={<img src= {item.links[0].href} onClick= {() => this.showModal(index)} height="200" width="200"/>}

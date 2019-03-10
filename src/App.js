@@ -71,6 +71,11 @@ handleOk = (e) => {
     })
   }
 
+  onClick = item => {
+    ls.set("search", item)
+    this.search()
+  }
+
 
   search = e => {
     axios.get("https://images-api.nasa.gov/search?q=" + ls.get("search") + "&media_type=image")
@@ -174,7 +179,9 @@ handleOk = (e) => {
           ?<List
              size="small"
              dataSource={JSON.parse(ls.get("searchHistory")).reverse()}
-             renderItem={item => (<List.Item>{item}</List.Item>)}
+             renderItem={item => (
+               <List.Item style = {{cursor: "pointer"}} value = {item}  onClick = {() => this.onClick(item)}>{item}</List.Item>
+             )}
            />:
            <div></div>
          }

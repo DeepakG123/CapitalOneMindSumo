@@ -123,6 +123,16 @@ handleOk = (e) => {
     this.setState({})
   }
 
+  //Add JSON item to Favorite
+  addFavorite = e => {
+    if(this.state.nasaData != ""){
+      var favorites = ls.get("favorites")
+      favorites = JSON.parse(favorites)
+      favorites.push(this.state.nasaData.items[this.state.currentItem])
+      ls.set("favorites", JSON.stringify(favorites))
+    }
+  }
+
   //Called when componenet loads
   componentDidMount() {
       var array = []
@@ -139,12 +149,18 @@ handleOk = (e) => {
       if(ls.get("searchHistory") == "null"){
         ls.set("searchHistory", JSON.stringify(array))
       }
+      if(ls.get("favorites") == "null" || !ls.get("favorites")){
+        ls.set("favorites", JSON.stringify(array))
+      }
       if(!ls.get("search")){
         ls.set("search", "")
       }
       if(!ls.get("location")){
         ls.set("location", "")
       }
+      this.setState({
+
+      })
       //Axios call, shows last search on start up
       axios.get("https://images-api.nasa.gov/search?q=" + ls.get("search") + "&media_type=image")
       .then((res => {
@@ -183,8 +199,6 @@ handleOk = (e) => {
       )}
     )
 
-    console.log((ls.get("center")))
-    console.log((ls.get("search")))
     return (
       <div className="App">
       <Header>
@@ -260,6 +274,9 @@ handleOk = (e) => {
         <p> Center: {this.state.nasaData.items[this.state.currentItem].data[0].center} </p>
         <p> Date Created: {this.state.nasaData.items[this.state.currentItem].data[0].date_created} </p>
         <p> Description: {this.state.nasaData.items[this.state.currentItem].data[0].description_508} </p>
+        <div style= {{textAlign: "center"}}>
+        <Button icon="star" onClick = {e => this.addFavorite(e)}>Add to Favorites</Button>
+        </div>
       </Modal>:
       <div/>
       }

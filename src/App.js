@@ -3,16 +3,30 @@ import './App.css';
 import PhotoDisplay from './PhotoDisplay.js';
 import axios from 'axios';
 import ls from 'local-storage'
-import { Input, Button, Col, Card, Modal, Layout, Collapse, DatePicker, Row} from 'antd';
+import { Input, Button, Col, Card, Modal, Layout, Collapse, DatePicker, Row, Checkbox} from 'antd';
 import 'antd/dist/antd.css';
 const { Header, Content} = Layout;
 const { Meta } = Card;
 const InputGroup = Input.Group;
 const Search = Input.Search;
 const Panel = Collapse.Panel;
+const CheckboxGroup = Checkbox.Group;
+
 
 const api_key = process.env.REACT_APP_API_KEY
 var searchHistory = [];
+
+const options = [
+  { label: 'Jet Propulsion Laboratory (JPL)', value: 'Jet Propulsion Laboratory (JPL)' },
+  { label: 'Headquarters (HQ)', value: 'Headquarters (HQ)' },
+  { label: 'Kennedy Space Center (KSC)', value: 'Kennedy Space Center (KSC)' },
+  { label: 'Goddard Space Flight Center (GSFC)', value: 'Goddard Space Flight Center (GSFC)' },
+  { label: 'Langley Research Center (LARC)', value: 'Langley Research Center (LARC)' },
+  { label: 'Ames Research Center (ARC)', value: 'Ames Research Center (ARC)' },
+  { label: 'Marshall Space Flight Center (MSFC)', value: 'Marshall Space Flight Center (MSFC)' },
+  { label: 'John C. Stennis Space Center (SSC)', value: 'John C. Stennis Space Center (SSC)' },
+  { label: 'Armstrong Flight Research Center (ARFC)', value: 'Armstrong Flight Research Center (ARFC)' },
+];
 
 
 class App extends Component {
@@ -21,7 +35,8 @@ class App extends Component {
       search: "",
       location: "",
       visible: false,
-      currentItem: 0
+      currentItem: 0,
+      checkedCenters: []
   }
 
   showModal = (index) => {
@@ -50,6 +65,13 @@ handleOk = (e) => {
   handleUserInput = e => {
     ls.set(e.target.id, e.target.value)
   };
+
+  onChange = checkedValues => {
+    this.setState({
+      checkedCenters: checkedValues
+    })
+  }
+
 
   search = e => {
     axios.get("https://images-api.nasa.gov/search?q=" + ls.get("search") + "&media_type=image")
@@ -87,9 +109,6 @@ handleOk = (e) => {
   render() {
     console.log("Search History: " + ls.get("searchHistory"))
     if(this.state.nasaData != ""){
-        console.log(this.state)
-    }
-    if(this.state.nasaData != ""){
     var photos = this.state.nasaData.items.slice(0, 25).map((item,index) => {
           return(
         <Col span={6}  style={{paddingTop: 15, paddingRight: 20, paddingLeft: 20}}>
@@ -117,13 +136,17 @@ handleOk = (e) => {
       </Header>
       <div className= "SearchForm">
       <Search style={{ width: 300, textAlign: 'center'}} placeholder="Search" id = "search" onChange={e => this.handleUserInput(e)} />
-      <div className= "MoreOptions" style = {{paddingLeft: "37.5%", paddingTop: "1%"}}>
-      <Collapse  defaultActiveKey={['0']} style={{ width: 350}}>
-        <Panel header="More Search Options" key="1">
+      <div className= "MoreOptions" style = {{paddingLeft: "31%", paddingTop: "1%"}}>
+      <Collapse  defaultActiveKey={['0']} style={{ width: 400}}>
+        <Panel header="Date Range" key="1">
           <Col>
-          <Search style={{ width: 300}} placeholder="Location" id= "location" onChange={e => this.handleUserInput(e)}/>
-          <Search style={{ width: 300}} placeholder="Start Year" id= "startYear" onChange={e => this.handleUserInput(e)}/>
-          <Search style={{ width: 300}} placeholder="End Year" id= "endYear" onChange={e => this.handleUserInput(e)}/>
+          <Search style={{ width: 350}} placeholder="Start Year" id= "startYear" onChange={e => this.handleUserInput(e)}/>
+          <Search style={{ width: 350}} placeholder="End Year" id= "endYear" onChange={e => this.handleUserInput(e)}/>
+          </Col>
+        </Panel>
+        <Panel header="Nasa Centers" key="2">
+          <Col>
+          <CheckboxGroup options={options} onChange = {checkedValues => this.onChange(checkedValues)} />
           </Col>
         </Panel>
       </Collapse>

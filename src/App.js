@@ -162,7 +162,8 @@ handleOk = (e) => {
       if(ls.get("center") == "null" || !ls.get("center")){
         ls.set("center", "")
       }
-      if(ls.get("searchHistory") == "null"){
+      if(ls.get("searchHistory") == "null"|| !ls.get("searchHistory")){
+        console.log("gets here")
         ls.set("searchHistory", JSON.stringify(array))
       }
       if(ls.get("favorites") == "null" || !ls.get("favorites")){
@@ -189,6 +190,7 @@ handleOk = (e) => {
 }
 
   render() {
+    var array = []
     if(this.state.nasaData != ""){
 
     //Maps each photo to a display card, displayed in a grid
@@ -208,7 +210,7 @@ handleOk = (e) => {
     else{
       var photos = null
     }
-    if(this.state.nasaData != ""){
+    if(this.state.nasaData != "" && ls.get("favorites") != JSON.stringify(array)){
     var favPhotos = JSON.parse(ls.get("favorites")).map((item,index) => {
       return(
         <Col span={6}  style={{paddingTop: 15, paddingRight: 20, paddingLeft: 20}}>
@@ -222,6 +224,9 @@ handleOk = (e) => {
         </Col>
       )
     })
+  }
+  else{
+    var favPhotos = null
   }
 
     var centers = options.map(option => {
@@ -256,7 +261,7 @@ handleOk = (e) => {
         </Menu>
         </div>
         {favPhotos}
-        {(this.state.nasaData != "")
+        {(this.state.nasaData != "" && ls.get("favorites") != JSON.stringify(array))
         ?<Modal
           title="Basic Modal"
           visible={this.state.visible}
@@ -274,7 +279,7 @@ handleOk = (e) => {
         </div>
       )
     }
-
+    console.log(ls.get("favorites"))
     return (
       <div className="App">
       <Header>
@@ -321,7 +326,7 @@ handleOk = (e) => {
         <Panel header="Search History" key="3">
           <Col>
           </Col>
-          {(ls.get("searchHistory") != "null")
+          {(ls.get("searchHistory") != null)
           ?<List
             header={<div><strong>Click Item to Search</strong></div>}
              size="small"

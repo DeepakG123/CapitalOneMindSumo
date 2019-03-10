@@ -3,7 +3,7 @@ import './App.css';
 import PhotoDisplay from './PhotoDisplay.js';
 import axios from 'axios';
 import ls from 'local-storage'
-import { Input, Button, Col, Card, Modal, Layout, Collapse, DatePicker, Row, Checkbox} from 'antd';
+import { Input, Button, Col, Card, Modal, Layout, Collapse, DatePicker, Row, Checkbox, Menu, Icon, List} from 'antd';
 import 'antd/dist/antd.css';
 const { Header, Content} = Layout;
 const { Meta } = Card;
@@ -14,7 +14,6 @@ const CheckboxGroup = Checkbox.Group;
 
 
 const api_key = process.env.REACT_APP_API_KEY
-var searchHistory = [];
 
 const options = [
   { label: 'Jet Propulsion Laboratory (JPL)', value: 'Jet Propulsion Laboratory (JPL)' },
@@ -36,7 +35,7 @@ class App extends Component {
       location: "",
       visible: false,
       currentItem: 0,
-      checkedCenters: []
+      checkedCenters: [],
   }
 
   showModal = (index) => {
@@ -79,20 +78,23 @@ handleOk = (e) => {
     let data = res.data;
     this.setState({nasaData: data.collection})
     }))
-    var searchHistory
-    if(ls.get("searchHistory") != ""){
-      searchHistory = ls.get("searchHistory")
-    }
-    else{
-      searchHistory = []
-      ls.set("searchHistory", JSON.stringify(searchHistory))
-    }
+    var searchHistory = ls.get("searchHistory")
     searchHistory = JSON.parse(searchHistory)
     searchHistory.push(ls.get("search"))
     ls.set("searchHistory", JSON.stringify(searchHistory))
   }
 
+  clearSearch = e => {
+    var array = []
+    ls.set("searchHistory", JSON.stringify(array))
+    this.setState({})
+  }
+
   componentDidMount() {
+      var array = []
+      if(ls.get("searchHistory") == "null"){
+        ls.set("searchHistory", JSON.stringify(array))
+      }
       if(!ls.get("search")){
         ls.set("search", "")
       }
@@ -102,12 +104,14 @@ handleOk = (e) => {
       axios.get("https://images-api.nasa.gov/search?q=" + ls.get("search") + "&media_type=image")
       .then((res => {
       let data = res.data;
-      this.setState({nasaData: data.collection})
+      this.setState(
+        {
+          nasaData: data.collection,
+        })
       }))
 }
 
   render() {
-    console.log("Search History: " + ls.get("searchHistory"))
     if(this.state.nasaData != ""){
     var photos = this.state.nasaData.items.slice(0, 25).map((item,index) => {
           return(
@@ -125,8 +129,7 @@ handleOk = (e) => {
     else{
       var photos = null
     }
-
-    console.log(ls.get("search") != null)
+    console.log(ls.get("searchHistory"))
     return (
       <div className="App">
       <Header>
@@ -134,9 +137,24 @@ handleOk = (e) => {
         Nasa Image Library Search
         </Content>
       </Header>
+      <Menu
+      onClick={this.handleClick}
+      selectedKeys={[this.state.current]}
+      mode="horizontal"
+      >
+      <Menu.Item key="home page">
+        <Icon type="home" />Home Page
+      </Menu.Item>
+      <Menu.Item key="app">
+        <Icon type="camera" />Image Search
+      </Menu.Item>
+      <Menu.Item key="favorite">
+        <Icon type="star" />Favorite Images
+      </Menu.Item>
+      </Menu>
       <div className= "SearchForm">
-      <Search style={{ width: 300, textAlign: 'center'}} placeholder="Search" id = "search" onChange={e => this.handleUserInput(e)} />
-      <div className= "MoreOptions" style = {{paddingLeft: "31%", paddingTop: "1%"}}>
+      <Search style={{ width: 400, textAlign: 'center'}} placeholder="Search" id = "search" onChange={e => this.handleUserInput(e)} />
+      <div className= "MoreOptions" style = {{paddingLeft: "35.4%", paddingTop: "1%"}}>
       <Collapse  defaultActiveKey={['0']} style={{ width: 400}}>
         <Panel header="Date Range" key="1">
           <Col>
@@ -144,10 +162,23 @@ handleOk = (e) => {
           <Search style={{ width: 350}} placeholder="End Year" id= "endYear" onChange={e => this.handleUserInput(e)}/>
           </Col>
         </Panel>
-        <Panel header="Nasa Centers" key="2">
+        <Panel header="NASA Centers" key="2">
           <Col>
           <CheckboxGroup options={options} onChange = {checkedValues => this.onChange(checkedValues)} />
           </Col>
+        </Panel>
+        <Panel header="Search History" key="3">
+          <Col>
+          </Col>
+          {(ls.get("searchHistory") != "null")
+          ?<List
+             size="small"
+             dataSource={JSON.parse(ls.get("searchHistory")).reverse()}
+             renderItem={item => (<List.Item>{item}</List.Item>)}
+           />:
+           <div></div>
+         }
+          <Button  type="secondary" htmlType="submit" onClick = {e => this.clearSearch(e)}> Clear Search History </Button>
         </Panel>
       </Collapse>
       </div>

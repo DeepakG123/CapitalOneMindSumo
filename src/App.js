@@ -3,7 +3,7 @@ import './App.css';
 import PhotoDisplay from './PhotoDisplay.js';
 import axios from 'axios';
 import ls from 'local-storage'
-import { Input, Button, Col, Card, Modal, Layout, Collapse, DatePicker, Row, Checkbox, Menu, Icon, List} from 'antd';
+import { Input, InputNumber,  Button, Col, Card, Modal, Layout, Collapse, DatePicker, Row, Checkbox, Menu, Icon, List} from 'antd';
 import 'antd/dist/antd.css';
 const { Header, Content} = Layout;
 const { Meta } = Card;
@@ -12,9 +12,10 @@ const Search = Input.Search;
 const Panel = Collapse.Panel;
 const CheckboxGroup = Checkbox.Group;
 
-
+//API key hidden
 const api_key = process.env.REACT_APP_API_KEY
 
+//Tuple of all NASA centers
 const options = [
   { label: 'Jet Propulsion Laboratory (JPL)', value: 'Jet Propulsion Laboratory (JPL)' },
   { label: 'Headquarters (HQ)', value: 'Headquarters (HQ)' },
@@ -38,7 +39,8 @@ class App extends Component {
       checkedCenters: [],
   }
 
-  showModal = (index) => {
+//Function for opening Modal to show image metadata
+showModal = (index) => {
   console.log("index: " + index)
   this.setState({
     visible: true,
@@ -46,6 +48,7 @@ class App extends Component {
   });
 }
 
+//Modal Button Function
 handleOk = (e) => {
    console.log(e);
    this.setState({
@@ -53,6 +56,7 @@ handleOk = (e) => {
    });
  }
 
+ //Modal Button Function
  handleCancel = (e) => {
    console.log(e);
    this.setState({
@@ -60,43 +64,59 @@ handleOk = (e) => {
    });
  }
 
-
+  //General function for storing user input from inout fields
   handleUserInput = e => {
     ls.set(e.target.id, e.target.value)
   };
 
+  //Stores which NASA centers are selected
   onChange = checkedValues => {
     this.setState({
       checkedCenters: checkedValues
     })
   }
 
+  //onClick function for search history list,
+  //searches for whatever item is clicked on
   onClick = item => {
     ls.set("search", item)
     this.search()
   }
 
 
+  //Search function, sends request to NASA's api
+  //Adds search fields to search history array
   search = e => {
+    //Axios used for API request
     axios.get("https://images-api.nasa.gov/search?q=" + ls.get("search") + "&media_type=image")
     .then((res => {
     let data = res.data;
     this.setState({nasaData: data.collection})
     }))
+    //Updates search history
     var searchHistory = ls.get("searchHistory")
     searchHistory = JSON.parse(searchHistory)
     searchHistory.push(ls.get("search"))
     ls.set("searchHistory", JSON.stringify(searchHistory))
   }
 
+  //Clears search history
   clearSearch = e => {
     var array = []
     ls.set("searchHistory", JSON.stringify(array))
     this.setState({})
   }
 
+  //Called when componenet loads
   componentDidMount() {
       var array = []
+      //Setting up local storage on first use
+      if(!ls.get("startYear")){
+        ls.set("startYear", "1920")
+      }
+      if(!ls.get("endYear")){
+        ls.set("endYear", "2019")
+      }
       if(ls.get("searchHistory") == "null"){
         ls.set("searchHistory", JSON.stringify(array))
       }
@@ -106,6 +126,7 @@ handleOk = (e) => {
       if(!ls.get("location")){
         ls.set("location", "")
       }
+      //Axios call, shows last search on start up
       axios.get("https://images-api.nasa.gov/search?q=" + ls.get("search") + "&media_type=image")
       .then((res => {
       let data = res.data;
@@ -118,6 +139,8 @@ handleOk = (e) => {
 
   render() {
     if(this.state.nasaData != ""){
+
+    //Maps each photo to a display card, displayed in a grid 
     var photos = this.state.nasaData.items.slice(0, 25).map((item,index) => {
           return(
         <Col span={6}  style={{paddingTop: 15, paddingRight: 20, paddingLeft: 20}}>
@@ -134,7 +157,8 @@ handleOk = (e) => {
     else{
       var photos = null
     }
-    console.log(ls.get("searchHistory"))
+
+    console.log((ls.get("endYear")))
     return (
       <div className="App">
       <Header>
@@ -163,12 +187,16 @@ handleOk = (e) => {
       <Collapse  defaultActiveKey={['0']} style={{ width: 400}}>
         <Panel header="Date Range" key="1">
           <Col>
+          <div><strong>Search by Start Year and/or End Year</strong></div>
+          <br/>
           <Search style={{ width: 350}} placeholder="Start Year" id= "startYear" onChange={e => this.handleUserInput(e)}/>
           <Search style={{ width: 350}} placeholder="End Year" id= "endYear" onChange={e => this.handleUserInput(e)}/>
           </Col>
         </Panel>
         <Panel header="NASA Centers" key="2">
           <Col>
+          <div><strong>Search by NASA Centers</strong></div>
+          <br/>
           <CheckboxGroup options={options} onChange = {checkedValues => this.onChange(checkedValues)} />
           </Col>
         </Panel>
@@ -177,6 +205,7 @@ handleOk = (e) => {
           </Col>
           {(ls.get("searchHistory") != "null")
           ?<List
+            header={<div><strong>Click Item to Search</strong></div>}
              size="small"
              dataSource={JSON.parse(ls.get("searchHistory")).reverse()}
              renderItem={item => (

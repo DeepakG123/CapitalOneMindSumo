@@ -30,6 +30,15 @@ const options = [
   { label: 'Armstrong Flight Research Center (ARFC)', value: 'ARFC' },
 ];
 
+const sortOptions = ["Newest First", "Oldest First", "Alphabetical"]
+
+// <Panel header="Sort Results" key="2">
+//   <Col>
+//   <Select defaultValue="All" style={{ width: 300, paddingBottom: 20}} id = "sort">
+//   </Select>
+//   <Button  type="secondary" htmlType="submit" >Update Search</Button>
+//   </Col>
+// </Panel>
 
 class App extends Component {
   state = {
@@ -60,7 +69,6 @@ showModal = (index) => {
 
 //Modal Button Function
 handleOk = (e) => {
-   console.log(e);
    this.setState({
      visible: false,
    });
@@ -68,7 +76,6 @@ handleOk = (e) => {
 
  //Modal Button Function
  handleCancel = (e) => {
-   console.log(e);
    this.setState({
      visible: false,
    });
@@ -96,7 +103,6 @@ handleOk = (e) => {
 
   //Menu selector, changes page
   handleClick = (e) => {
-    console.log('click ', e);
     this.setState({
       current: e.key,
     });
@@ -111,8 +117,6 @@ handleOk = (e) => {
   //Search function, sends request to NASA's api
   //Adds search fields to search history array
   search = e => {
-    console.log("Start Year: " + ls.get("startYear"))
-    console.log("End Year: " + ls.get("endYear"))
     var searchString = ""
     //API Request
     searchString = "https://images-api.nasa.gov/search?q=" + ls.get("search") + "&media_type=image&year_start=" + ls.get("startYear") + "&year_end=" + ls.get("endYear") + "&center=" + ls.get("center")
@@ -163,7 +167,6 @@ handleOk = (e) => {
         ls.set("center", "")
       }
       if(ls.get("searchHistory") == "null"|| !ls.get("searchHistory")){
-        console.log("gets here")
         ls.set("searchHistory", JSON.stringify(array))
       }
       if(ls.get("favorites") == "null" || !ls.get("favorites")){
@@ -201,7 +204,7 @@ handleOk = (e) => {
         >
         <Meta
           title={item.data[0].title}
-          onClick= {this.showModal}
+          onClick= {() => this.showModal(index)}
         />
         </Card>
         </Col>
@@ -211,14 +214,14 @@ handleOk = (e) => {
       var photos = null
     }
     if(this.state.nasaData != "" && ls.get("favorites") != JSON.stringify(array)){
-    var favPhotos = JSON.parse(ls.get("favorites")).map((item,index) => {
+    var favPhotos = JSON.parse(ls.get("favorites")).reverse().map((item,index) => {
       return(
         <Col span={6}  style={{paddingTop: 15, paddingRight: 20, paddingLeft: 20}}>
         <Card  hoverable cover={<img src= {item.links[0].href} onClick= {() => this.showModal(index)} height="200" width="200"/>}
         >
         <Meta
           title={item.data[0].title}
-          onClick= {this.showModal}
+          onClick= {() => this.showModal(index)}
         />
         </Card>
         </Col>
@@ -234,7 +237,6 @@ handleOk = (e) => {
         <Option value={option.value} onClick= {() => this.setCenter(option.value)} >{option.label}</Option>
       )}
     )
-    console.log("current: " + this.state.current)
     if(this.state.current == "favorite"){
       return (
         <div>
@@ -279,7 +281,7 @@ handleOk = (e) => {
         </div>
       )
     }
-    console.log(ls.get("favorites"))
+    console.log(this.state.nasaData)
     return (
       <div className="App">
       <Header>
@@ -306,16 +308,12 @@ handleOk = (e) => {
       <Search style={{ width: 400, textAlign: 'center'}} placeholder="Search" id = "search" onChange={e => this.handleUserInput(e)} />
       <div className= "MoreOptions" style = {{paddingLeft: "35.4%", paddingTop: "1%"}}>
       <Collapse  defaultActiveKey={['0']} style={{ width: 400}}>
-        <Panel header="Date Range" key="1">
+        <Panel header="More Search Options" key="1">
           <Col>
           <div><strong>Search by Start Year and/or End Year</strong></div>
           <br/>
           <Search style={{ width: 350}} type="number"  placeholder="Start Year" id= "startYear" onChange={e => this.handleUserInput(e)}/>
           <Search style={{ width: 350}} type="number" placeholder="End Year" id= "endYear" onChange={e => this.handleUserInput(e)}/>
-          </Col>
-        </Panel>
-        <Panel header="NASA Centers" key="2">
-          <Col>
           <div><strong>Search by NASA Centers</strong></div>
           <br/>
           <Select defaultValue="All" style={{ width: 300 }} options={options} id = "center">
@@ -345,7 +343,7 @@ handleOk = (e) => {
       <Button  type="primary" htmlType="submit" onClick = {e => this.search(e)}> Submit </Button>
       </div>
       {photos}
-      {(this.state.nasaData != "")
+      {(this.state.nasaData != "" && this.state.nasaData != "null")
       ?<Modal
         title="Basic Modal"
         visible={this.state.visible}
@@ -354,7 +352,14 @@ handleOk = (e) => {
         title = {this.state.nasaData.items[this.state.currentItem].data[0].title}>
         <p> Center: {this.state.nasaData.items[this.state.currentItem].data[0].center} </p>
         <p> Date Created: {this.state.nasaData.items[this.state.currentItem].data[0].date_created} </p>
-        <p> Description: {this.state.nasaData.items[this.state.currentItem].data[0].description_508} </p>
+        {(this.state.nasaData.items[this.state.currentItem].data[0].photographer != null)
+          ?<p> Photogapher: {this.state.nasaData.items[this.state.currentItem].data[0].photographer} </p>
+          :<div></div>
+        }
+        {(this.state.nasaData.items[this.state.currentItem].data[0].description_508 != null)
+        ?<p> Description: {this.state.nasaData.items[this.state.currentItem].data[0].description_508} </p>
+        :<p>Description: {this.state.nasaData.items[this.state.currentItem].data[0].description} </p>
+        }
         <div style= {{textAlign: "center"}}>
         <Button icon="star" onClick = {e => this.addFavorite(e)}>Add to Favorites</Button>
         </div>

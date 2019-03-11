@@ -27,6 +27,10 @@
   color: #61dafb;
 }
 
+.white-box {
+    background-color: white;
+}
+
 .searchItem:hover {
   cursor: pointer;
 }

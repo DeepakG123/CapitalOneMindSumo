@@ -40,6 +40,10 @@ const sortOptions = ["Newest First", "Oldest First", "Alphabetical"]
 //   </Col>
 // </Panel>
 
+// <Content style = {{color: "white", textAlign: 'center',  fontSize: "large"}}>
+// Nasa Image Library Search
+// </Content>
+
 class App extends Component {
   state = {
       nasaData: "",
@@ -247,16 +251,15 @@ handleOk = (e) => {
     if(this.state.current == "favorite"){
       return (
         <div>
+        <div style= {{position: 'fixed', width: '100%', zIndex: 1}}>
         <Header>
-          <Content style = {{color: "white", textAlign: 'center',  fontSize: "large"}}>
-          Nasa Image Library Search
-          </Content>
-        </Header>
-        <div style = {{textAlign: 'center'}}>
+        <div className="logo" />
         <Menu
-        onClick={this.handleClick}
-        selectedKeys={[this.state.current]}
-        mode="horizontal"
+          theme="dark"
+          mode="horizontal"
+          style={{ lineHeight: '64px', textAlign: 'center' }}
+          onClick={this.handleClick}
+          selectedKeys={[this.state.current]}
         >
         <Menu.Item key="app">
           <Icon type="camera" />Home Page
@@ -265,8 +268,11 @@ handleOk = (e) => {
           <Icon type="star" />Favorite Images
         </Menu.Item>
         </Menu>
+      </Header>
         </div>
+        <div style = {{paddingTop: '5%'}}>
         {favPhotos}
+        </div>
         {(this.state.nasaData != "" && ls.get("favorites") != JSON.stringify(array))
         ?<Modal
           title="Basic Modal"
@@ -289,15 +295,15 @@ handleOk = (e) => {
     console.log((this.state.nasaData.items))
     return (
       <div className="App">
-      <Header>
-        <Content style = {{color: "white", textAlign: 'center',  fontSize: "large"}}>
-        Nasa Image Library Search
-        </Content>
-      </Header>
+      <div style= {{position: 'fixed', width: '100%', zIndex: 1}}>
+      <Header style = {{width: '100%'}}>
+      <div className="logo" />
       <Menu
-      onClick={this.handleClick}
-      selectedKeys={[this.state.current]}
-      mode="horizontal"
+        theme="dark"
+        mode="horizontal"
+        style={{ lineHeight: '64px' }}
+        onClick={this.handleClick}
+        selectedKeys={[this.state.current]}
       >
       <Menu.Item key="app">
         <Icon type="camera" />Home Page
@@ -306,8 +312,10 @@ handleOk = (e) => {
         <Icon type="star" />Favorite Images
       </Menu.Item>
       </Menu>
-      <div className= "SearchForm">
       <Search style={{ width: 400, textAlign: 'center'}} placeholder="Search" id = "search" onPressEnter={e => this.search(e)} onChange={e => this.handleUserInput(e)} />
+    </Header>
+      </div>
+      <div className= "SearchForm" style = {{paddingTop: '8%'}}>
       <div className= "MoreOptions" style = {{paddingLeft: "35.4%", paddingTop: "1%"}}>
       <Collapse  defaultActiveKey={['0']} style={{ width: 400}}>
         <Panel header="More Search Options" key="1">

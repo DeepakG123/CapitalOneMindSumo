@@ -122,6 +122,9 @@ handleOk = (e) => {
     searchString = "https://images-api.nasa.gov/search?q=" + ls.get("search") + "&media_type=image&year_start=" + ls.get("startYear") + "&year_end=" + ls.get("endYear") + "&center=" + ls.get("center")
     //Axios used for API request
     axios.get(searchString)
+    .catch((error) =>{
+      console.log("Bad Request")
+    })
     .then((res => {
     let data = res.data;
     this.setState({nasaData: data.collection})
@@ -155,6 +158,7 @@ handleOk = (e) => {
 
   //Called when componenet loads
   componentDidMount() {
+    //ls.set("search", "neptune")
       var array = []
       //Setting up local storage on first use
       if(!ls.get("endYear")){
@@ -183,6 +187,9 @@ handleOk = (e) => {
       })
       //Axios call, shows last search on start up
       axios.get("https://images-api.nasa.gov/search?q=" + ls.get("search") + "&media_type=image")
+      .catch((error) =>{
+        console.log("Bad Request")
+      })
       .then((res => {
       let data = res.data;
       this.setState(
@@ -251,11 +258,8 @@ handleOk = (e) => {
         selectedKeys={[this.state.current]}
         mode="horizontal"
         >
-        <Menu.Item key="home page">
-          <Icon type="home" />Home Page
-        </Menu.Item>
         <Menu.Item key="app">
-          <Icon type="camera" />Image Search
+          <Icon type="camera" />Home Page
         </Menu.Item>
         <Menu.Item key="favorite">
           <Icon type="star" />Favorite Images
@@ -281,7 +285,8 @@ handleOk = (e) => {
         </div>
       )
     }
-    console.log(this.state.nasaData)
+    var array = []
+    console.log((this.state.nasaData.items))
     return (
       <div className="App">
       <Header>
@@ -294,18 +299,15 @@ handleOk = (e) => {
       selectedKeys={[this.state.current]}
       mode="horizontal"
       >
-      <Menu.Item key="home page">
-        <Icon type="home" />Home Page
-      </Menu.Item>
       <Menu.Item key="app">
-        <Icon type="camera" />Image Search
+        <Icon type="camera" />Home Page
       </Menu.Item>
       <Menu.Item key="favorite">
         <Icon type="star" />Favorite Images
       </Menu.Item>
       </Menu>
       <div className= "SearchForm">
-      <Search style={{ width: 400, textAlign: 'center'}} placeholder="Search" id = "search" onChange={e => this.handleUserInput(e)} />
+      <Search style={{ width: 400, textAlign: 'center'}} placeholder="Search" id = "search" onPressEnter={e => this.search(e)} onChange={e => this.handleUserInput(e)} />
       <div className= "MoreOptions" style = {{paddingLeft: "35.4%", paddingTop: "1%"}}>
       <Collapse  defaultActiveKey={['0']} style={{ width: 400}}>
         <Panel header="More Search Options" key="1">
@@ -321,14 +323,14 @@ handleOk = (e) => {
           </Select>
           </Col>
         </Panel>
-        <Panel header="Search History" key="3">
+        <Panel header="Most Recent Searches" key="3">
           <Col>
           </Col>
           {(ls.get("searchHistory") != null)
           ?<List
             header={<div><strong>Click Item to Search</strong></div>}
              size="small"
-             dataSource={JSON.parse(ls.get("searchHistory")).reverse()}
+             dataSource={JSON.parse(ls.get("searchHistory")).reverse().slice(0,5)}
              renderItem={item => (
                <List.Item style = {{cursor: "pointer"}} value = {item}  onClick = {() => this.onClick(item)}>{item}</List.Item>
              )}

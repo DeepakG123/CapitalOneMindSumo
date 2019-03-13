@@ -46,6 +46,8 @@ class App extends Component {
       currentItem: 0,
       currentFav: 0,
       checkedCenters: [],
+      dateSort: false,
+      sortedData: []
   }
 
 //Function for opening Modal to show image metadata
@@ -75,16 +77,32 @@ showInfoModal = (e) => {
 handleOk = (e) => {
   console.log("modal type: " + e.target.id)
    this.setState({
-     [e.target.id]: false,
+     visible: false,
    });
  }
 
  //General Modal Button Function
  handleCancel = (e) => {
    this.setState({
-     [e.target.id]: false,
+     visible: false,
    });
  }
+
+ //General Modal Button Function
+ handleInfoOk = (e) => {
+   console.log("modal type: " + e.target.id)
+    this.setState({
+      infoVisible: false,
+    });
+  }
+
+  //General Modal Button Function
+  handleInfoCancel = (e) => {
+    this.setState({
+      infoVisible: false,
+    });
+  }
+
 
   //General function for storing user input from inout fields
   handleUserInput = e => {
@@ -125,6 +143,23 @@ handleOk = (e) => {
     ls.set("sort", option)
   }
 
+  sortData = e => {
+    var sort_array = [];
+    for (var key in this.state.nasaData.items) {
+        sort_array.push({key:key,date:this.state.nasaData.items[key].data[0].date_created});
+    }
+    sort_array.sort(function(a,b){
+    // Turn your strings into dates, and then subtract them
+    // to get a value that is either negative, positive, or zero.
+    return new Date(b.date) - new Date(a.date);
+    });
+    this.setState({
+      sortedData: sort_array,
+      dateSort:true
+    })
+    console.log(sort_array)
+  }
+
 
   //Search function, sends request to NASA's api
   //Adds search fields to search history array
@@ -149,10 +184,6 @@ handleOk = (e) => {
     ls.set("startYear", "1920")
     ls.set("endYear", "2019")
     ls.set("center", "")
-  }
-
-  sortResults = e =>{
-
   }
 
   //Clears search history
@@ -228,9 +259,24 @@ handleOk = (e) => {
   render() {
     var array = []
     if(this.state.nasaData != ""){
+      console.log(this.state.nasaData)
 
     //Maps each photo to a display card, displayed in a grid
-    console.log(this.state.nasaData.items.slice(0, 50))
+    if(this.state.dateSort){
+      var photos = this.state.sortedData.map((item,index) => {
+            return(
+          <Col span={6}  style={{paddingTop: 15, paddingRight: 20, paddingLeft: 20}}>
+          <Card value = {parseInt(item.key)} hoverable cover={<img src= {this.state.nasaData.items[item.key].links[0].href} onClick= {() => this.showModal(parseInt(item.key))} height="200" width="200"/>}
+          >
+          <Meta
+            title={this.state.nasaData.items[item.key].data[0].title}
+            onClick= {() => this.showModal(parseInt(item.key))}
+          />
+          </Card>
+          </Col>
+        )})
+    }
+    else{
     var photos = this.state.nasaData.items.slice(0, 50).map((item,index) => {
           return(
         <Col span={6}  style={{paddingTop: 15, paddingRight: 20, paddingLeft: 20}}>
@@ -243,6 +289,7 @@ handleOk = (e) => {
         </Card>
         </Col>
       )})
+    }
     }
     else{
       var photos = null
@@ -331,7 +378,6 @@ handleOk = (e) => {
       )
     }
     var array = []
-    console.log(ls.get("sort"))
     return (
       <div className="App">
       <div style= {{position: 'fixed', width: '100%', zIndex: 1}}>
@@ -394,7 +440,7 @@ handleOk = (e) => {
           <Select defaultValue="All" style={{ width: 300}} id = "sort">
           {sorts}
           </Select>
-          <Button  type="secondary" htmlType="submit"  >Update Search</Button>
+          <Button  type="secondary" htmlType="submit" onClick = {e => this.sortData(e)} >Update Search</Button>
           </Col>
         </Panel>
       </Collapse>
@@ -431,8 +477,8 @@ handleOk = (e) => {
       <Modal
       id= "infoVisible"
       visible={this.state.infoVisible}
-      onOk={this.handleOk}
-      onCancel={this.handleCancel}
+      onOk={this.handleInfoOk}
+      onCancel={this.handleInfoCancel}
       >
       </Modal>
       </div>

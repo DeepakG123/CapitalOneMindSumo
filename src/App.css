@@ -3,8 +3,13 @@
 }
 
 .SearchForm{
-  padding: 30px
+  padding: 30px;
+  background-image: url("https://www.nasa.gov/images/content/635040main_potw1213a.jpg");
+  background-size: cover;
 }
+
+
+
 
 .App-logo {
   animation: App-logo-spin infinite 20s linear;

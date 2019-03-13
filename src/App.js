@@ -3,7 +3,7 @@ import './App.css';
 import PhotoDisplay from './PhotoDisplay.js';
 import axios from 'axios';
 import ls from 'local-storage'
-import { Input, InputNumber,  Button, Col, Card, Modal, Layout, Collapse, DatePicker, Row, Checkbox, Menu, Icon, List, Select} from 'antd';
+import { Input, InputNumber,  Button, Col, Card, Modal, Layout, Collapse, DatePicker, Row, Checkbox, Menu, Icon, List, Select, PageHeader} from 'antd';
 import 'antd/dist/antd.css';
 const { Header, Content} = Layout;
 const { Meta } = Card;
@@ -32,14 +32,6 @@ const options = [
 
 const sortOptions = ["Newest First", "Oldest First", "Alphabetical"]
 
-// <Panel header="Sort Results" key="2">
-//   <Col>
-//   <Select defaultValue="All" style={{ width: 300, paddingBottom: 20}} id = "sort">
-//   </Select>
-//   <Button  type="secondary" htmlType="submit" >Update Search</Button>
-//   </Col>
-// </Panel>
-
 // <Content style = {{color: "white", textAlign: 'center',  fontSize: "large"}}>
 // Nasa Image Library Search
 // </Content>
@@ -50,6 +42,7 @@ class App extends Component {
       search: "",
       location: "",
       visible: false,
+      infoVisible: false,
       currentItem: 0,
       currentFav: 0,
       checkedCenters: [],
@@ -71,17 +64,25 @@ showModal = (index) => {
 }
 }
 
-//Modal Button Function
+//Function for opening  Information Modal
+showInfoModal = (e) => {
+  this.setState({
+    infoVisible:true
+  })
+}
+
+//General Modal Button Function
 handleOk = (e) => {
+  console.log("modal type: " + e.target.id)
    this.setState({
-     visible: false,
+     [e.target.id]: false,
    });
  }
 
- //Modal Button Function
+ //General Modal Button Function
  handleCancel = (e) => {
    this.setState({
-     visible: false,
+     [e.target.id]: false,
    });
  }
 
@@ -110,11 +111,18 @@ handleOk = (e) => {
     this.setState({
       current: e.key,
     });
+    //Scroll to top on clicking a menu item
+    window.scrollTo(0, 0);
   }
 
   //Which NASA center to search for
   setCenter = center => {
     ls.set("center", center)
+  }
+
+  //Sort result selection
+  setCenter = option => {
+    ls.set("sort", option)
   }
 
 
@@ -143,10 +151,21 @@ handleOk = (e) => {
     ls.set("center", "")
   }
 
+  sortResults = e =>{
+
+  }
+
   //Clears search history
   clearSearch = e => {
     var array = []
     ls.set("searchHistory", JSON.stringify(array))
+    this.setState({})
+  }
+
+  //Clears Favorites
+  clearFavorites= e => {
+    var array = []
+    ls.set("favorites", JSON.stringify(array))
     this.setState({})
   }
 
@@ -186,6 +205,9 @@ handleOk = (e) => {
       if(!ls.get("location")){
         ls.set("location", "")
       }
+      if(!ls.get("sort")){
+        ls.set("sort", "")
+      }
       this.setState({
 
       })
@@ -208,6 +230,7 @@ handleOk = (e) => {
     if(this.state.nasaData != ""){
 
     //Maps each photo to a display card, displayed in a grid
+    console.log(this.state.nasaData.items.slice(0, 50))
     var photos = this.state.nasaData.items.slice(0, 50).map((item,index) => {
           return(
         <Col span={6}  style={{paddingTop: 15, paddingRight: 20, paddingLeft: 20}}>
@@ -248,6 +271,13 @@ handleOk = (e) => {
         <Option value={option.value} onClick= {() => this.setCenter(option.value)} >{option.label}</Option>
       )}
     )
+
+    var sorts = sortOptions.map(option => {
+      return(
+        <Option value={option} onClick= {() => this.setCenter(option)} >{option}</Option>
+
+      )
+    })
     if(this.state.current == "favorite"){
       return (
         <div>
@@ -261,6 +291,9 @@ handleOk = (e) => {
           onClick={this.handleClick}
           selectedKeys={[this.state.current]}
         >
+        <Menu.Item key="info" onClick>
+          <Icon type="info-circle" />About the App
+        </Menu.Item>
         <Menu.Item key="app">
           <Icon type="camera" />Home Page
         </Menu.Item>
@@ -271,6 +304,12 @@ handleOk = (e) => {
       </Header>
         </div>
         <div style = {{paddingTop: '5%'}}>
+        <div style = {{paddingTop: '1%', paddingBottom: '2%', textAlign: 'center'}} >
+        { (JSON.parse(ls.get("favorites")).length != 0)
+        ?<Button type="secondary" htmlType="submit" onClick = {e => this.clearFavorites(e)}> Clear Favorites</Button>
+        :<strong> Images you favorite will appear here! </strong>
+        }
+        </div>
         {favPhotos}
         </div>
         {(this.state.nasaData != "" && ls.get("favorites") != JSON.stringify(array))
@@ -292,7 +331,7 @@ handleOk = (e) => {
       )
     }
     var array = []
-    console.log((this.state.nasaData.items))
+    console.log(ls.get("sort"))
     return (
       <div className="App">
       <div style= {{position: 'fixed', width: '100%', zIndex: 1}}>
@@ -305,6 +344,9 @@ handleOk = (e) => {
         onClick={this.handleClick}
         selectedKeys={[this.state.current]}
       >
+      <Menu.Item key="info" onClick= {() => this.showInfoModal()}>
+        <Icon type="info-circle" />About the App
+      </Menu.Item>
       <Menu.Item key="app">
         <Icon type="camera" />Home Page
       </Menu.Item>
@@ -315,7 +357,7 @@ handleOk = (e) => {
       <Search style={{ width: 400, textAlign: 'center'}} placeholder="Search" id = "search" onPressEnter={e => this.search(e)} onChange={e => this.handleUserInput(e)} />
     </Header>
       </div>
-      <div className= "SearchForm" style = {{paddingTop: '8%'}}>
+      <div className= "SearchForm"   style = {{paddingTop: '8%', zIndex: 2}}>
       <div className= "MoreOptions" style = {{paddingLeft: "35.4%", paddingTop: "1%"}}>
       <Collapse  defaultActiveKey={['0']} style={{ width: 400}}>
         <Panel header="More Search Options" key="1">
@@ -347,15 +389,25 @@ handleOk = (e) => {
          }
           <Button  type="secondary" htmlType="submit" onClick = {e => this.clearSearch(e)}> Clear Search History </Button>
         </Panel>
+        <Panel header="Sort Results" key="2">
+          <Col>
+          <Select defaultValue="All" style={{ width: 300}} id = "sort">
+          {sorts}
+          </Select>
+          <Button  type="secondary" htmlType="submit"  >Update Search</Button>
+          </Col>
+        </Panel>
       </Collapse>
       </div>
       <br/>
       <Button  type="primary" htmlType="submit" onClick = {e => this.search(e)}> Submit </Button>
       </div>
+      <div className = "photoGrid">
       {photos}
+      </div>
       {(this.state.nasaData != "" && this.state.nasaData != "null")
       ?<Modal
-        title="Basic Modal"
+        id= "visible"
         visible={this.state.visible}
         onOk={this.handleOk}
         onCancel={this.handleCancel}
@@ -376,6 +428,13 @@ handleOk = (e) => {
       </Modal>:
       <div/>
       }
+      <Modal
+      id= "infoVisible"
+      visible={this.state.infoVisible}
+      onOk={this.handleOk}
+      onCancel={this.handleCancel}
+      >
+      </Modal>
       </div>
     );
   }

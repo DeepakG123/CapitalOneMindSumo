@@ -30,7 +30,7 @@ const options = [
   { label: 'Armstrong Flight Research Center (ARFC)', value: 'ARFC' },
 ];
 
-const sortOptions = ["Newest First", "Oldest First", "Alphabetical"]
+const sortOptions = ["Newest First", "Oldest First", "Alphabetical: A-Z", "Alphabetical: Z-A"]
 
 // <Content style = {{color: "white", textAlign: 'center',  fontSize: "large"}}>
 // Nasa Image Library Search
@@ -150,36 +150,43 @@ handleOk = (e) => {
     ls.set("sort", option)
   }
 
+
   sortData = e => {
     var sort_array = [];
-    if(this.state.sort == "Newest First"){
+    //Refactor date searches to remove code repitition, just modify sort function then call it on data
     for (var key in this.state.nasaData.items) {
-        sort_array.push({key:key,date:this.state.nasaData.items[key].data[0].date_created});
+        sort_array.push({key:key,title:this.state.nasaData.items[key].data[0].title, date:this.state.nasaData.items[key].data[0].date_created});
     }
+    if(this.state.sort == "Newest First"){
     sort_array.sort(function(a,b){
     // Turn your strings into dates, and then subtract them
     // to get a value that is either negative, positive, or zero.
     return new Date(b.date) - new Date(a.date);
     });
+    }
+    else if(this.state.sort == "Oldest First"){
+    sort_array.sort(function(a,b){
+    return new Date(a.date) - new Date(b.date);
+    });
+    }
+    else if(this.state.sort == "Alphabetical: A-Z"){
+      sort_array.sort(function(a,b){
+      if(a.title < b.title) { return -1; }
+      if(a.title > b.title) { return 1; }
+      return 0;
+      });
+    }
+    else if(this.state.sort == "Alphabetical: Z-A"){
+      sort_array.sort(function(a,b){
+      if(a.title < b.title) { return 1; }
+      if(a.title > b.title) { return -1; }
+      return 0;
+      });
+    }
     this.setState({
       sortedData: sort_array,
       dateSort:true
     })
-    }
-    else if(this.state.sort == "Oldest First"){
-      for (var key in this.state.nasaData.items) {
-          sort_array.push({key:key,date:this.state.nasaData.items[key].data[0].date_created});
-      }
-      sort_array.sort(function(a,b){
-      // Turn your strings into dates, and then subtract them
-      // to get a value that is either negative, positive, or zero.
-      return new Date(b.date) - new Date(a.date);
-      });
-      this.setState({
-        sortedData: sort_array.reverse(),
-        dateSort:true
-      })
-    }
   }
 
 

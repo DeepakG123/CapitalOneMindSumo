@@ -47,6 +47,7 @@ class App extends Component {
       currentFav: 0,
       checkedCenters: [],
       dateSort: false,
+      sort: "",
       sortedData: []
   }
 
@@ -117,6 +118,12 @@ handleOk = (e) => {
     })
   }
 
+  handleChange = value => {
+    this.setState({
+      sort: value
+    })
+  }
+
   //onClick function for search history list,
   //searches for whatever item is clicked on
   onClick = item => {
@@ -145,6 +152,7 @@ handleOk = (e) => {
 
   sortData = e => {
     var sort_array = [];
+    if(this.state.sort == "Newest First"){
     for (var key in this.state.nasaData.items) {
         sort_array.push({key:key,date:this.state.nasaData.items[key].data[0].date_created});
     }
@@ -157,7 +165,21 @@ handleOk = (e) => {
       sortedData: sort_array,
       dateSort:true
     })
-    console.log(sort_array)
+    }
+    else if(this.state.sort == "Oldest First"){
+      for (var key in this.state.nasaData.items) {
+          sort_array.push({key:key,date:this.state.nasaData.items[key].data[0].date_created});
+      }
+      sort_array.sort(function(a,b){
+      // Turn your strings into dates, and then subtract them
+      // to get a value that is either negative, positive, or zero.
+      return new Date(b.date) - new Date(a.date);
+      });
+      this.setState({
+        sortedData: sort_array.reverse(),
+        dateSort:true
+      })
+    }
   }
 
 
@@ -259,7 +281,7 @@ handleOk = (e) => {
   render() {
     var array = []
     if(this.state.nasaData != ""){
-      console.log(this.state.nasaData)
+      console.log(this.state.sort)
 
     //Maps each photo to a display card, displayed in a grid
     if(this.state.dateSort){
@@ -437,7 +459,7 @@ handleOk = (e) => {
         </Panel>
         <Panel header="Sort Results" key="2">
           <Col>
-          <Select defaultValue="All" style={{ width: 300}} id = "sort">
+          <Select defaultValue="All" style={{ width: 300}} id = "sort" onChange={this.handleChange} >
           {sorts}
           </Select>
           <Button  type="secondary" htmlType="submit" onClick = {e => this.sortData(e)} >Update Search</Button>

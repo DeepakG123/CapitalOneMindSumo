@@ -504,7 +504,7 @@ handleOk = (e) => {
       <div className = "photoGrid">
       {photos}
       </div>
-      {(this.state.nasaData != "" && this.state.nasaData != "null" && this.state.nasaData === undefined)
+      {(this.state.nasaData != "" && this.state.nasaData != "null" && this.state.nasaData.metadata.total_hits != 0)
       ?<Modal
         id= "visible"
         visible={this.state.visible}

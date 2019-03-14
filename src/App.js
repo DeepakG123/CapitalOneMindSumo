@@ -34,6 +34,8 @@ const options = [
 
 const sortOptions = ["Newest First", "Oldest First", "Alphabetical: A-Z", "Alphabetical: Z-A"]
 
+const yearPattern = /^(19|20)\d{2}$/
+
 
 // <Content style = {{color: "white", textAlign: 'center',  fontSize: "large"}}>
 // Nasa Image Library Search
@@ -111,7 +113,8 @@ handleOk = (e) => {
 
   //General function for storing user input from inout fields
   handleUserInput = e => {
-    //Add error checking for years here
+    console.log(yearPattern.test( e.target.value))
+    //Error checking for years here
     ls.set(e.target.id, e.target.value)
   };
 
@@ -150,7 +153,7 @@ handleOk = (e) => {
   }
 
   //Sort result selection
-  setCenter = option => {
+  setSort = option => {
     ls.set("sort", option)
   }
 
@@ -205,7 +208,14 @@ handleOk = (e) => {
   search = e => {
     var searchString = ""
     //API Request
+    if(!yearPattern.test(ls.get("startYear"))){
+      ls.set("startYear", "1920")
+    }
+    if(!yearPattern.test(ls.get("endYear"))){
+      ls.set("endYear", "2019")
+    }
     searchString = "https://images-api.nasa.gov/search?q=" + ls.get("search") + "&media_type=image&year_start=" + ls.get("startYear") + "&year_end=" + ls.get("endYear") + "&center=" + ls.get("center")
+    console.log(searchString)
     //Axios used for API request
     axios.get(searchString)
     .catch((error) =>{
@@ -227,8 +237,15 @@ handleOk = (e) => {
 
   //Function to handle bad searches
   badCall = e => {
+    var searchHistory = ls.get("searchHistory")
+    searchHistory = JSON.parse(searchHistory)
     message.warning('Search Returned No Results! Default Results Shown.');
-    ls.set("search", "")
+    if(searchHistory.length > 1){
+      ls.set("search", searchHistory[searchHistory.length-2])
+    }
+    else(
+      ls.set("search","")
+    )
     this.search()
   }
 
@@ -260,7 +277,7 @@ handleOk = (e) => {
   componentDidMount() {
       var array = []
       //Setting up local storage on first use
-      if(!ls.get("endYear")){
+      if(!ls.get("startYear")){
         ls.set("startYear", "1920")
       }
       if(!ls.get("endYear")){
@@ -368,7 +385,7 @@ handleOk = (e) => {
 
     var sorts = sortOptions.map(option => {
       return(
-        <Option value={option} onClick= {() => this.setCenter(option)} >{option}</Option>
+        <Option value={option} onClick= {() => this.setSort(option)} >{option}</Option>
 
       )
     })

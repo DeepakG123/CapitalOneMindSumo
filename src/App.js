@@ -3,8 +3,9 @@ import './App.css';
 import PhotoDisplay from './PhotoDisplay.js';
 import axios from 'axios';
 import ls from 'local-storage'
-import { Input, InputNumber,  Button, Col, Card, Modal, Layout, Collapse, DatePicker, Row, Checkbox, Menu, Icon, List, Select, PageHeader} from 'antd';
+import { Input, InputNumber,  Button, Col, Card, Modal, Layout, Collapse, DatePicker, Row, Checkbox, Menu, Icon, List, Select, PageHeader, BackTop} from 'antd';
 import 'antd/dist/antd.css';
+import { Twitter, Facebook, Google } from 'react-social-sharing'
 const { Header, Content} = Layout;
 const { Meta } = Card;
 const InputGroup = Input.Group;
@@ -12,6 +13,7 @@ const Search = Input.Search;
 const Panel = Collapse.Panel;
 const CheckboxGroup = Checkbox.Group;
 const Option = Select.Option;
+
 
 //API key hidden in .env file -> gitignore
 const api_key = process.env.REACT_APP_API_KEY
@@ -288,7 +290,7 @@ handleOk = (e) => {
   render() {
     var array = []
     if(this.state.nasaData != ""){
-      console.log(this.state.sort)
+      console.log(this.state.nasaData)
 
     //Maps each photo to a display card, displayed in a grid
     if(this.state.dateSort){
@@ -409,6 +411,7 @@ handleOk = (e) => {
     var array = []
     return (
       <div className="App">
+      <BackTop />
       <div style= {{position: 'fixed', width: '100%', zIndex: 1}}>
       <Header style = {{width: '100%'}}>
       <div className="logo" />
@@ -429,7 +432,7 @@ handleOk = (e) => {
         <Icon type="star" />Favorite Images
       </Menu.Item>
       </Menu>
-      <Search style={{ width: 400, textAlign: 'center'}} placeholder="Search" id = "search" onPressEnter={e => this.search(e)} onChange={e => this.handleUserInput(e)} />
+      <Search style={{ width: 400, textAlign: 'center'}}  placeholder="Search" id = "search" onPressEnter={e => this.search(e)} onChange={e => this.handleUserInput(e)} />
     </Header>
       </div>
       <div className= "SearchForm"   style = {{paddingTop: '8%', zIndex: 2}}>
@@ -466,7 +469,7 @@ handleOk = (e) => {
         </Panel>
         <Panel header="Sort Results" key="2">
           <Col>
-          <Select defaultValue="All" style={{ width: 300}} id = "sort" onChange={this.handleChange} >
+          <Select defaultValue="None" style={{ width: 300, paddingBottom: "2%"}} id = "sort" onChange={this.handleChange} >
           {sorts}
           </Select>
           <Button  type="secondary" htmlType="submit" onClick = {e => this.sortData(e)} >Update Search</Button>
@@ -499,6 +502,9 @@ handleOk = (e) => {
         }
         <div style= {{textAlign: "center"}}>
         <Button icon="star" onClick = {e => this.addFavorite(e)}>Add to Favorites</Button>
+        <br/>
+        <Facebook link= {this.state.nasaData.items[this.state.currentItem].links[0].href} />
+        <Google link= {this.state.nasaData.items[this.state.currentItem].links[0].href} />
         </div>
       </Modal>:
       <div/>

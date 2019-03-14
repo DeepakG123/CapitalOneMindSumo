@@ -3,7 +3,7 @@ import './App.css';
 import PhotoDisplay from './PhotoDisplay.js';
 import axios from 'axios';
 import ls from 'local-storage'
-import { Input, InputNumber,  Button, Col, Card, Modal, Layout, Collapse, DatePicker, Row, Checkbox, Menu, Icon, List, Select, PageHeader, BackTop} from 'antd';
+import { Input, InputNumber,  Button, Col, Card, Modal, Layout, Collapse, DatePicker, Row, Checkbox, Menu, Icon, List, Select, PageHeader, BackTop, message} from 'antd';
 import 'antd/dist/antd.css';
 import { Twitter, Facebook, Google } from 'react-social-sharing'
 const { Header, Content} = Layout;
@@ -34,6 +34,7 @@ const options = [
 
 const sortOptions = ["Newest First", "Oldest First", "Alphabetical: A-Z", "Alphabetical: Z-A"]
 
+
 // <Content style = {{color: "white", textAlign: 'center',  fontSize: "large"}}>
 // Nasa Image Library Search
 // </Content>
@@ -52,6 +53,7 @@ class App extends Component {
       sort: "",
       sortedData: []
   }
+
 
 //Function for opening Modal to show image metadata
 showModal = (index) => {
@@ -191,6 +193,12 @@ handleOk = (e) => {
     })
   }
 
+  clearSort = e => {
+    this.setState({
+      dateSort:false
+    })
+  }
+
 
   //Search function, sends request to NASA's api
   //Adds search fields to search history array
@@ -215,6 +223,13 @@ handleOk = (e) => {
     ls.set("startYear", "1920")
     ls.set("endYear", "2019")
     ls.set("center", "")
+  }
+
+  //Function to handle bad searches
+  badCall = e => {
+    message.warning('Search Returned No Results! Default Results Shown.');
+    ls.set("search", "")
+    this.search()
   }
 
   //Clears search history
@@ -243,7 +258,6 @@ handleOk = (e) => {
 
   //Called when componenet loads
   componentDidMount() {
-    //ls.set("search", "neptune")
       var array = []
       //Setting up local storage on first use
       if(!ls.get("endYear")){
@@ -290,7 +304,9 @@ handleOk = (e) => {
   render() {
     var array = []
     if(this.state.nasaData != ""){
-      console.log(this.state.nasaData)
+      if(this.state.nasaData.metadata.total_hits == 0){
+        this.badCall();
+      }
 
     //Maps each photo to a display card, displayed in a grid
     if(this.state.dateSort){
@@ -474,7 +490,10 @@ handleOk = (e) => {
           <Select defaultValue="None" style={{ width: "95%", paddingBottom: "2%"}} id = "sort" onChange={this.handleChange} >
           {sorts}
           </Select>
-          <Button  type="secondary" htmlType="submit" onClick = {e => this.sortData(e)} >Update Search</Button>
+          <div style = {{paddingBottom: "2%"}}>
+          <Button  type="primary" htmlType="submit" onClick = {e => this.sortData(e)} >Update Search</Button>
+          </div>
+          <Button  type="secondary" htmlType="submit"onClick = {e => this.clearSort(e)} >Clear Options</Button>
           </Col>
         </Panel>
       </Collapse>
@@ -485,7 +504,7 @@ handleOk = (e) => {
       <div className = "photoGrid">
       {photos}
       </div>
-      {(this.state.nasaData != "" && this.state.nasaData != "null")
+      {(this.state.nasaData != "" && this.state.nasaData != "null" && this.state.nasaData === undefined)
       ?<Modal
         id= "visible"
         visible={this.state.visible}
@@ -509,7 +528,7 @@ handleOk = (e) => {
         <Google link= {this.state.nasaData.items[this.state.currentItem].links[0].href} />
         </div>
       </Modal>:
-      <div/>
+      <div></div>
       }
       <Modal
       id= "infoVisible"

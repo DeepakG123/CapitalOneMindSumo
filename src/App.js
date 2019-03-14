@@ -160,7 +160,6 @@ handleOk = (e) => {
 
   sortData = e => {
     var sort_array = [];
-    //Refactor date searches to remove code repitition, just modify sort function then call it on data
     for (var key in this.state.nasaData.items) {
         sort_array.push({key:key,title:this.state.nasaData.items[key].data[0].title, date:this.state.nasaData.items[key].data[0].date_created});
     }
@@ -228,7 +227,9 @@ handleOk = (e) => {
     //Updates search history
     var searchHistory = ls.get("searchHistory")
     searchHistory = JSON.parse(searchHistory)
-    searchHistory.push(ls.get("search"))
+    if(searchHistory[searchHistory.length-1] != ls.get("search")){
+      searchHistory.push(ls.get("search"))
+    }
     ls.set("searchHistory", JSON.stringify(searchHistory))
     ls.set("startYear", "1920")
     ls.set("endYear", "2019")
@@ -321,12 +322,13 @@ handleOk = (e) => {
   render() {
     var array = []
     if(this.state.nasaData != ""){
+      console.log(ls.get("searchHistory"))
       if(this.state.nasaData.metadata.total_hits == 0){
         this.badCall();
       }
 
     //Maps each photo to a display card, displayed in a grid
-    if(this.state.dateSort){
+    if(this.state.dateSort && this.state.nasaData.metadata.total_hits != 0){
       var photos = this.state.sortedData.map((item,index) => {
             return(
           <Col span={6}  style={{paddingTop: "1%", paddingRight: "1.4%", paddingLeft: "1.4%"}}>
@@ -341,7 +343,7 @@ handleOk = (e) => {
         )})
     }
     else{
-    var photos = this.state.nasaData.items.slice(0, 50).map((item,index) => {
+    var photos = this.state.nasaData.items.map((item,index) => {
           return(
         <Col span={6}  style={{paddingTop: "1%", paddingRight: "1.4%", paddingLeft: "1.4%"}}>
         <Card value = {index} hoverable cover={<img src= {item.links[0].href} onClick= {() => this.showModal(index)} height="200" width="200"/>}

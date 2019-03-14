@@ -296,7 +296,7 @@ handleOk = (e) => {
     if(this.state.dateSort){
       var photos = this.state.sortedData.map((item,index) => {
             return(
-          <Col span={6}  style={{paddingTop: 15, paddingRight: 20, paddingLeft: 20}}>
+          <Col span={6}  style={{paddingTop: "1%", paddingRight: "1.4%", paddingLeft: "1.4%"}}>
           <Card value = {parseInt(item.key)} hoverable cover={<img src= {this.state.nasaData.items[item.key].links[0].href} onClick= {() => this.showModal(parseInt(item.key))} height="200" width="200"/>}
           >
           <Meta
@@ -310,7 +310,7 @@ handleOk = (e) => {
     else{
     var photos = this.state.nasaData.items.slice(0, 50).map((item,index) => {
           return(
-        <Col span={6}  style={{paddingTop: 15, paddingRight: 20, paddingLeft: 20}}>
+        <Col span={6}  style={{paddingTop: "1%", paddingRight: "1.4%", paddingLeft: "1.4%"}}>
         <Card value = {index} hoverable cover={<img src= {item.links[0].href} onClick= {() => this.showModal(index)} height="200" width="200"/>}
         >
         <Meta
@@ -328,7 +328,7 @@ handleOk = (e) => {
     if(this.state.nasaData != "" && ls.get("favorites") != JSON.stringify(array)){
     var favPhotos = JSON.parse(ls.get("favorites")).reverse().map((item,index) => {
       return(
-        <Col span={6}  style={{paddingTop: 15, paddingRight: 20, paddingLeft: 20}}>
+        <Col span={6}  style={{paddingTop: "1%", paddingRight: "1.4%", paddingLeft: "1.4%"}}>
         <Card  hoverable cover={<img src= {item.links[0].href} onClick= {() => this.showModal(index)} height="200" width="200"/>}
         >
         <Meta
@@ -401,6 +401,8 @@ handleOk = (e) => {
           <p> Date Created: {JSON.parse(ls.get("favorites"))[this.state.currentFav].data[0].date_created}</p>
           <p> Description: {JSON.parse(ls.get("favorites"))[this.state.currentFav].data[0].description_508}</p>
           <div style= {{textAlign: "center"}}>
+          <Facebook link= {this.state.nasaData.items[this.state.currentItem].links[0].href} />
+          <Google link= {this.state.nasaData.items[this.state.currentItem].links[0].href} />
           </div>
         </Modal>:
         <div/>
@@ -432,21 +434,21 @@ handleOk = (e) => {
         <Icon type="star" />Favorite Images
       </Menu.Item>
       </Menu>
-      <Search style={{ width: 400, textAlign: 'center'}}  placeholder="Search" id = "search" onPressEnter={e => this.search(e)} onChange={e => this.handleUserInput(e)} />
+      <Search style={{ width: "30%", textAlign: 'center'}}  placeholder="Search" id = "search" onPressEnter={e => this.search(e)} onChange={e => this.handleUserInput(e)} />
     </Header>
       </div>
       <div className= "SearchForm"   style = {{paddingTop: '8%', zIndex: 2}}>
       <div className= "MoreOptions" style = {{paddingLeft: "35.4%", paddingTop: "1%"}}>
-      <Collapse  defaultActiveKey={['0']} style={{ width: 400}}>
+      <Collapse  defaultActiveKey={['0']} style={{ width: "45%"}}>
         <Panel header="More Search Options" key="1">
           <Col>
           <div><strong>Search by Start Year and/or End Year</strong></div>
           <br/>
-          <Search style={{ width: 350}} type="number"  placeholder="Start Year" id= "startYear" onChange={e => this.handleUserInput(e)}/>
-          <Search style={{ width: 350}} type="number" placeholder="End Year" id= "endYear" onChange={e => this.handleUserInput(e)}/>
+          <Search style={{ width: "95%"}} type="number"  placeholder="Start Year" id= "startYear" onChange={e => this.handleUserInput(e)}/>
+          <Search style={{ width: "95%"}} type="number" placeholder="End Year" id= "endYear" onChange={e => this.handleUserInput(e)}/>
           <div><strong>Search by NASA Centers</strong></div>
           <br/>
-          <Select defaultValue="All" style={{ width: 300 }} options={options} id = "center">
+          <Select defaultValue="All" style={{ width: "95%"}} options={options} id = "center">
           {centers}
           </Select>
           </Col>
@@ -469,7 +471,7 @@ handleOk = (e) => {
         </Panel>
         <Panel header="Sort Results" key="2">
           <Col>
-          <Select defaultValue="None" style={{ width: 300, paddingBottom: "2%"}} id = "sort" onChange={this.handleChange} >
+          <Select defaultValue="None" style={{ width: "95%", paddingBottom: "2%"}} id = "sort" onChange={this.handleChange} >
           {sorts}
           </Select>
           <Button  type="secondary" htmlType="submit" onClick = {e => this.sortData(e)} >Update Search</Button>

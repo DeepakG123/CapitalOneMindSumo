@@ -6,8 +6,8 @@
   padding: 2%;
   background-image: url("https://www.nasa.gov/images/content/635040main_potw1213a.jpg");
   background-size: cover;
+  background-position: center;
   z-index: 1;
-
 }
 
 

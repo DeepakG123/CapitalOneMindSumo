@@ -37,10 +37,6 @@ const sortOptions = ["Newest First", "Oldest First", "Alphabetical: A-Z", "Alpha
 const yearPattern = /^(19|20)\d{2}$/
 
 
-// <Content style = {{color: "white", textAlign: 'center',  fontSize: "large"}}>
-// Nasa Image Library Search
-// </Content>
-
 class App extends Component {
   state = {
       nasaData: "",
@@ -240,7 +236,7 @@ handleOk = (e) => {
   badCall = e => {
     var searchHistory = ls.get("searchHistory")
     searchHistory = JSON.parse(searchHistory)
-    message.warning('Search Returned No Results! Default Results Shown.');
+    message.warning('Search Returned No Results!');
     if(searchHistory.length > 1){
       ls.set("search", searchHistory[searchHistory.length-2])
     }
@@ -271,7 +267,15 @@ handleOk = (e) => {
       favorites = JSON.parse(favorites)
       favorites.push(this.state.nasaData.items[this.state.currentItem])
       ls.set("favorites", JSON.stringify(favorites))
+      message.success('Added to Favorites!');
     }
+  }
+
+  //Move to next item
+  nextItem = e => {
+    this.setState({
+      currentItem: this.state.currentItem+1
+    })
   }
 
   //Called when componenet loads
@@ -404,7 +408,7 @@ handleOk = (e) => {
           onClick={this.handleClick}
           selectedKeys={[this.state.current]}
         >
-        <Menu.Item key="info" onClick>
+        <Menu.Item key="info" onClick= {() => this.showInfoModal()}>
           <Icon type="info-circle" />About the App
         </Menu.Item>
         <Menu.Item key="app">
@@ -554,7 +558,16 @@ handleOk = (e) => {
       visible={this.state.infoVisible}
       onOk={this.handleInfoOk}
       onCancel={this.handleInfoCancel}
-      >
+      title = "About the App">
+      <h4> Built with: </h4>
+        <ul>
+          <li>React.js - Javascript Library used</li>
+          <li>NASA Image and Video Library - NASA API</li>
+          <li>Ant Design - React UI Framework Used</li>
+          <li>Heroku - Used for Application Deployment</li>
+        </ul>
+        <h4> Author: <a href="https://github.com/DeepakG123">Deepak Goel</a> </h4>
+        <h4> <a href="https://github.com/DeepakG123/CapitalOneMindsumo">Github Repository</a> </h4>
       </Modal>
       </div>
     );

@@ -32,8 +32,11 @@ const options = [
   { label: 'Armstrong Flight Research Center (ARFC)', value: 'ARFC' },
 ];
 
+
+//Options for sorting results
 const sortOptions = ["Newest First", "Oldest First", "Alphabetical: A-Z", "Alphabetical: Z-A"]
 
+//Regex expression for testing startYear and endYear input
 const yearPattern = /^(19|20)\d{2}$/
 
 
@@ -140,7 +143,7 @@ handleOk = (e) => {
       current: e.key,
     });
     //Scroll to top on clicking a menu item
-    window.scrollTo(0, 0);
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   //Which NASA center to search for
@@ -154,6 +157,8 @@ handleOk = (e) => {
   }
 
 
+  //Function to sort data when Update Search is clicked, applies a specific
+  //sort function based on the user input
   sortData = e => {
     var sort_array = [];
     for (var key in this.state.nasaData.items) {
@@ -191,6 +196,7 @@ handleOk = (e) => {
     })
   }
 
+  //Clear sort options from results
   clearSort = e => {
     this.setState({
       dateSort:false
@@ -423,7 +429,7 @@ handleOk = (e) => {
         <div style = {{paddingTop: '5%'}}>
         <div style = {{paddingTop: '1%', paddingBottom: '2%', textAlign: 'center'}} >
         { (JSON.parse(ls.get("favorites")).length != 0)
-        ?<Button type="secondary" htmlType="submit" onClick = {e => this.clearFavorites(e)}> Clear Favorites</Button>
+        ?<Button icon = "delete" type="secondary" htmlType="submit" onClick = {e => this.clearFavorites(e)}> Clear Favorites</Button>
         :<strong> Images you favorite will appear here! </strong>
         }
         </div>
@@ -485,6 +491,7 @@ handleOk = (e) => {
           <br/>
           <Search style={{ width: "95%"}} type="number"  placeholder="Start Year" id= "startYear" onChange={e => this.handleUserInput(e)}/>
           <Search style={{ width: "95%"}} type="number" placeholder="End Year" id= "endYear" onChange={e => this.handleUserInput(e)}/>
+          <br/><br/>
           <div><strong>Search by NASA Centers</strong></div>
           <br/>
           <Select defaultValue="All" style={{ width: "95%"}} options={options} id = "center">
@@ -506,7 +513,8 @@ handleOk = (e) => {
            />:
            <div></div>
          }
-          <Button  type="secondary" htmlType="submit" onClick = {e => this.clearSearch(e)}> Clear Search History </Button>
+         <br/>
+          <Button  icon = "delete"  type="secondary" htmlType="submit" onClick = {e => this.clearSearch(e)}> Clear Search History </Button>
         </Panel>
         <Panel header="Sort Results" key="2">
           <Col>
@@ -534,15 +542,15 @@ handleOk = (e) => {
         onOk={this.handleOk}
         onCancel={this.handleCancel}
         title = {this.state.nasaData.items[this.state.currentItem].data[0].title}>
-        <p> Center: {this.state.nasaData.items[this.state.currentItem].data[0].center} </p>
-        <p> Date Created: {this.state.nasaData.items[this.state.currentItem].data[0].date_created} </p>
+        <p> <strong> Center: </strong> {this.state.nasaData.items[this.state.currentItem].data[0].center} </p>
+        <p> <strong> Date Created: </strong>{ this.state.nasaData.items[this.state.currentItem].data[0].date_created} </p>
         {(this.state.nasaData.items[this.state.currentItem].data[0].photographer != null)
           ?<p> Photogapher: {this.state.nasaData.items[this.state.currentItem].data[0].photographer} </p>
           :<div></div>
         }
         {(this.state.nasaData.items[this.state.currentItem].data[0].description_508 != null)
-        ?<p> Description: {this.state.nasaData.items[this.state.currentItem].data[0].description_508} </p>
-        :<p>Description: {this.state.nasaData.items[this.state.currentItem].data[0].description} </p>
+        ? <p> <strong> Description: </strong> {this.state.nasaData.items[this.state.currentItem].data[0].description_508} </p>
+        : <p> <strong> Description: </strong> {this.state.nasaData.items[this.state.currentItem].data[0].description} </p>
         }
         <div style= {{textAlign: "center"}}>
         <Button icon="star" onClick = {e => this.addFavorite(e)}>Add to Favorites</Button>
@@ -561,13 +569,13 @@ handleOk = (e) => {
       title = "About the App">
       <h4> Built with: </h4>
         <ul>
-          <li>React.js - Javascript Library used</li>
-          <li>NASA Image and Video Library - NASA API</li>
-          <li>Ant Design - React UI Framework Used</li>
-          <li>Heroku - Used for Application Deployment</li>
+          <li> <a href = "https://reactjs.org/docs/getting-started.html"> React.js </a> - Javascript Library used</li>
+          <li> <a href = "https://images.nasa.gov/docs/images.nasa.gov_api_docs.pdf"> NASA Image and Video Library </a>  - NASA API</li>
+          <li> <a href = "https://ant.design/docs/spec/introduce"> Ant Design </a>  - React UI Framework Used</li>
+          <li> <a href = "https://devcenter.heroku.com/"> Heroku </a> - Used for Application Deployment</li>
         </ul>
+        <h4> Github: <a href="https://github.com/DeepakG123/CapitalOneMindsumo">NASA Image and Video Library Search Application</a> </h4>
         <h4> Author: <a href="https://github.com/DeepakG123">Deepak Goel</a> </h4>
-        <h4> <a href="https://github.com/DeepakG123/CapitalOneMindsumo">Github Repository</a> </h4>
       </Modal>
       </div>
     );

@@ -1,6 +1,7 @@
 # NASA Image and Video Library Search Application 
 
-MindSumo Challenge: https://www.mindsumo.com/contests/nasa-image-archive
+MindSumo Challenge: https://www.mindsumo.com/contests/nasa-image-archive <br/>
+Application: https://nasaimagesearchsummit.herokuapp.com/
 
 ## Objectives
 Required: 
@@ -38,7 +39,6 @@ Bonus Features Implemented:
 * [NASA Image and Video Library](https://images.nasa.gov/docs/images.nasa.gov_api_docs.pdf) - NASA API
 * [Ant Design](https://ant.design/docs/spec/introduce) - React UI Framework Used 
 * [Heroku](https://devcenter.heroku.com/) - Used for Application Deployment
-
 
 ## Authors
 

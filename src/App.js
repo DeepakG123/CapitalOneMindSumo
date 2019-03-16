@@ -232,7 +232,12 @@ handleOk = (e) => {
     if(searchHistory[searchHistory.length-1] != ls.get("search")){
       searchHistory.push(ls.get("search"))
     }
-    ls.set("searchHistory", JSON.stringify(searchHistory))
+    if(searchHistory.length > 4){
+      ls.set("searchHistory", JSON.stringify(searchHistory.slice(searchHistory.length-5,searchHistory.length)))
+    }
+    else{
+      ls.set("searchHistory", JSON.stringify(searchHistory))
+    }
     ls.set("startYear", "1920")
     ls.set("endYear", "2019")
     ls.set("center", "")

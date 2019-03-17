@@ -224,6 +224,7 @@ handleOk = (e) => {
     })
     .then((res => {
     let data = res.data;
+    console.log(data)
     this.setState({nasaData: data.collection})
     }))
     //Updates search history

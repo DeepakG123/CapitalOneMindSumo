@@ -81,7 +81,6 @@ showInfoModal = (e) => {
 
 //General Modal Button Function
 handleOk = (e) => {
-  console.log("modal type: " + e.target.id)
    this.setState({
      visible: false,
    });
@@ -96,7 +95,6 @@ handleOk = (e) => {
 
  //General Modal Button Function
  handleInfoOk = (e) => {
-   console.log("modal type: " + e.target.id)
     this.setState({
       infoVisible: false,
     });
@@ -112,8 +110,6 @@ handleOk = (e) => {
 
   //General function for storing user input from inout fields
   handleUserInput = e => {
-    console.log(yearPattern.test( e.target.value))
-    //Error checking for years here
     ls.set(e.target.id, e.target.value)
   };
 
@@ -216,7 +212,6 @@ handleOk = (e) => {
       ls.set("endYear", "2019")
     }
     searchString = "https://images-api.nasa.gov/search?q=" + ls.get("search") + "&media_type=image&year_start=" + ls.get("startYear") + "&year_end=" + ls.get("endYear") + "&center=" + ls.get("center")
-    console.log(searchString)
     //Axios used for API request
     axios.get(searchString)
     .catch((error) =>{
@@ -224,7 +219,6 @@ handleOk = (e) => {
     })
     .then((res => {
     let data = res.data;
-    console.log(data)
     this.setState({nasaData: data.collection})
     }))
     //Updates search history
@@ -338,7 +332,6 @@ handleOk = (e) => {
   render() {
     var array = []
     if(this.state.nasaData != ""){
-      console.log(ls.get("searchHistory"))
       if(this.state.nasaData.metadata.total_hits == 0){
         this.badCall();
       }

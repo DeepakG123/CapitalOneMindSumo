@@ -224,7 +224,7 @@ handleOk = (e) => {
     //Updates search history
     var searchHistory = ls.get("searchHistory")
     searchHistory = JSON.parse(searchHistory)
-    if(searchHistory[searchHistory.length-1] != ls.get("search")){
+    if(searchHistory[searchHistory.length-1] != ls.get("search") && ls.get("search") != ""){
       searchHistory.push(ls.get("search"))
     }
     if(searchHistory.length > 4){
@@ -282,6 +282,15 @@ handleOk = (e) => {
     this.setState({
       currentItem: this.state.currentItem+1
     })
+  }
+
+  getFormattedDate = val => {
+      var date = new Date(val);
+      let year = date.getFullYear();
+      let month = (1 + date.getMonth()).toString().padStart(2, '0');
+      let day = date.getDate().toString().padStart(2, '0');
+
+      return month + '/' + day + '/' + year;
   }
 
   //Called when componenet loads
@@ -441,9 +450,12 @@ handleOk = (e) => {
           onOk={this.handleOk}
           onCancel={this.handleCancel}
           title = {JSON.parse(ls.get("favorites"))[this.state.currentFav].data[0].title}>
-          <p> Center: {JSON.parse(ls.get("favorites"))[this.state.currentFav].data[0].center} </p>
-          <p> Date Created: {JSON.parse(ls.get("favorites"))[this.state.currentFav].data[0].date_created}</p>
-          <p> Description: {JSON.parse(ls.get("favorites"))[this.state.currentFav].data[0].description_508}</p>
+          <p> <strong> Center: </strong> {JSON.parse(ls.get("favorites"))[this.state.currentFav].data[0].center} </p>
+          <p><strong>  Date Created: </strong>  {this.getFormattedDate(JSON.parse(ls.get("favorites"))[this.state.currentFav].data[0].date_created)}</p>
+          {(JSON.parse(ls.get("favorites"))[this.state.currentFav].data[0].description_508 != null)
+          ? <p> <strong> Description: </strong> {JSON.parse(ls.get("favorites"))[this.state.currentFav].data[0].description_508 } </p>
+          : <p> <strong> Description: </strong> {JSON.parse(ls.get("favorites"))[this.state.currentFav].data[0].description} </p>
+          }
           <div style= {{textAlign: "center"}}>
           <Facebook link= {this.state.nasaData.items[this.state.currentItem].links[0].href} />
           <Google link= {this.state.nasaData.items[this.state.currentItem].links[0].href} />
@@ -542,7 +554,7 @@ handleOk = (e) => {
         onCancel={this.handleCancel}
         title = {this.state.nasaData.items[this.state.currentItem].data[0].title}>
         <p> <strong> Center: </strong> {this.state.nasaData.items[this.state.currentItem].data[0].center} </p>
-        <p> <strong> Date Created: </strong>{ this.state.nasaData.items[this.state.currentItem].data[0].date_created} </p>
+        <p> <strong> Date Created: </strong>{ this.getFormattedDate(this.state.nasaData.items[this.state.currentItem].data[0].date_created)} </p>
         {(this.state.nasaData.items[this.state.currentItem].data[0].photographer != null)
           ?<p> Photogapher: {this.state.nasaData.items[this.state.currentItem].data[0].photographer} </p>
           :<div></div>
@@ -566,6 +578,18 @@ handleOk = (e) => {
       onOk={this.handleInfoOk}
       onCancel={this.handleInfoCancel}
       title = "About the App">
+      <h4> Description: </h4>
+        <p> This application allows a user to search NASA's Image and Video Archive. </p>
+      <h4> Features: </h4>
+      <ul>
+      <li>The additional search options narrow down the search by year range and NASA Center where the photo orginiated. </li>
+      <li>The user can view their most search history and recreate any search by clicking on a particular search. A user's search history
+      can also be cleared. </li>
+      <li> In addition to more search options, results from a search can also be sorted by date created and alphabetical order. </li>
+      <li> Click on any image cards reveals a description modal containing additional information about the image </li> 
+      <li> Any image from a search can be added to the favorites collection from the image description modal. Favorite imags
+      are dispalyed on a seperate page accesible by the menu.</li>
+      </ul>
       <h4> Built with: </h4>
         <ul>
           <li> <a href = "https://reactjs.org/docs/getting-started.html"> React.js </a> - Javascript Library used</li>

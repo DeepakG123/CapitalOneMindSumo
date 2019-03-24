@@ -18,6 +18,7 @@ const Option = Select.Option;
 //API key hidden in .env file -> gitignore
 const api_key = process.env.REACT_APP_API_KEY
 
+
 //Tuple of all NASA centers, value is used for API request
 const options = [
   { label: 'All', value: '' },
@@ -52,7 +53,8 @@ class App extends Component {
       checkedCenters: [],
       dateSort: false,
       sort: "",
-      sortedData: []
+      sortedData: [],
+      current: 'app'
   }
 
 
@@ -406,7 +408,6 @@ handleOk = (e) => {
     var sorts = sortOptions.map(option => {
       return(
         <Option value={option} onClick= {() => this.setSort(option)} >{option}</Option>
-
       )
     })
     if(this.state.current == "favorite"){
@@ -556,7 +557,7 @@ handleOk = (e) => {
         <p> <strong> Center: </strong> {this.state.nasaData.items[this.state.currentItem].data[0].center} </p>
         <p> <strong> Date Created: </strong>{ this.getFormattedDate(this.state.nasaData.items[this.state.currentItem].data[0].date_created)} </p>
         {(this.state.nasaData.items[this.state.currentItem].data[0].photographer != null)
-          ?<p> Photogapher: {this.state.nasaData.items[this.state.currentItem].data[0].photographer} </p>
+          ?<p> <strong> Photogapher: </strong> {this.state.nasaData.items[this.state.currentItem].data[0].photographer} </p>
           :<div></div>
         }
         {(this.state.nasaData.items[this.state.currentItem].data[0].description_508 != null)
@@ -586,7 +587,7 @@ handleOk = (e) => {
       <li>The user can view their most search history and recreate any search by clicking on a particular search. A user's search history
       can also be cleared. </li>
       <li> In addition to more search options, results from a search can also be sorted by date created and alphabetical order. </li>
-      <li> Click on any image cards reveals a description modal containing additional information about the image </li> 
+      <li> Click on any image cards reveals a description modal containing additional information about the image </li>
       <li> Any image from a search can be added to the favorites collection from the image description modal. Favorite imags
       are dispalyed on a seperate page accesible by the menu.</li>
       </ul>
